@@ -64,15 +64,5 @@ $(document).ready(function(){
 	$("#cancelHomeBtn").on("click", function(){
 		location.href = "/";
 	});
-	
-	/**
-	 *  2-3. 로그인 페이지로 강제로 돌아올 시 로그아웃을 안했어도 기존 쿠키 삭제(로그인을 한상태라면 로그인 창으로 가는 버튼이 안보이는데 강제로 url로 접근했다면 쿠키 삭제)
-	 	-> 2023-09-15 : 여기까지함
-	 */
-	deleteCookie();
-	
-	function deleteCookie() {
-		document.cookie = 'access_token' + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;';
-	}
 
 });

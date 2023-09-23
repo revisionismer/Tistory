@@ -16,9 +16,9 @@
             		<form id="userProfileImageForm">
                   	  <input type="file" class="my_hidden" id="profile-img-input" name="profileImageFile" />
                	 	</form>
-       	    
-               	 	<img src="/tistory/images/dog.jpg" class="my_profile_rounded_img_btn_lg" id="userProfileImage" onclick="">
-           
+       	    	
+           			<img th:if="${#request.getCookies() != null}" id="userProfileImage" class="my_profile_rounded_img_btn_lg" th:onclick="profileImageUpload();" src="" alt="" />
+           			
             	</div>
             	<div class="my_error_box my_hidden"></div>
             	<!-- 수정은 put 요청 fetch 사용해야함 -->
