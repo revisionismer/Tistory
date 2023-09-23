@@ -34,4 +34,31 @@
 	<div th:replace="fragments/footer :: footer"></div>
 
 </body>
+<script type="text/javascript">
+	// 2023-09-18 : 사용자가 직접 url을 입력해서 login페이지로 접속할 경우 만약 쿠키가 존재하면 강제 /logout 호출(재로그인)
+	//            : (참고로 로그인에 성공해서 access_token값을 쿠키로 가지고 있다면 login페이지로 가는 버튼이 안보인다.)
+	$(document).ready(function(){
+		
+		var ACCESS_TOKEN = getCookie('access_token');
+
+		function getCookie(key) {
+			let result = null;
+			let cookie = document.cookie.split(';');
+			cookie.some(function(item) {
+				item = item.replace(' ', '');
+			
+				let dic = item.split('=');
+				if(key === dic[0]) {
+					result = dic[1];
+					return true;
+				}
+			});
+			return result;
+		}
+	
+ 		if(ACCESS_TOKEN != null) {
+ 			location.href = "/logout";	
+ 		}
+	});;
+</script>
 </html>
