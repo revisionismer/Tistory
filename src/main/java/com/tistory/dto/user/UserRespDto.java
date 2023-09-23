@@ -15,13 +15,35 @@ public class UserRespDto {
 		private Long id;
 		private String username;
 		private String email;
+		private String profileImageUrl;
 		private String role;
 		
 		public UserInfoRespDto(User userEntity) {
 			this.id = userEntity.getId();
 			this.username = userEntity.getUsername();
 			this.email = userEntity.getEmail();
+			this.profileImageUrl = userEntity.getProfileImageUrl();
 			this.role = userEntity.getRole().getValue();
 		}
 	}
+	
+	@Getter @Setter
+	@ToString
+	public static class UserProfileRespDto {
+		private Long id;
+		private String username;
+		private String email;
+		private String role;
+		private String profileImageUrl;
+		
+		public UserProfileRespDto(User userEntity) {
+			this.id = userEntity.getId();
+			this.username = userEntity.getUsername();
+			this.email = userEntity.getEmail();
+			this.role = userEntity.getRole().getValue();
+			this.profileImageUrl = userEntity.getProfileImageUrl();
+		}
+		
+	}
+	
 }

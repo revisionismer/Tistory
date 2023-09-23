@@ -55,7 +55,9 @@ $(document).ready(function() {
 			error : function(res) {
 				console.log(res);
 				
-				if(res.responseJSON.data.username) {
+				if(res.responseJSON.message) {
+					alert(res.responseJSON.message);
+				} else if(res.responseJSON.data.username) {
 					alert(res.responseJSON.data.username);
 					$("#username").focus();
 				} else if(res.responseJSON.data.password) {
@@ -64,9 +66,7 @@ $(document).ready(function() {
 				} else if(res.responseJSON.data.email) {
 					alert(res.responseJSON.data.email);
 					$("#email").focus();
-				} else {
-					alert(res.responseJSON.message);
-				}
+				} 
 			
 			}
 		});	
