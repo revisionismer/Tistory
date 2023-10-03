@@ -43,7 +43,24 @@ public class UserRespDto {
 			this.role = userEntity.getRole().getValue();
 			this.profileImageUrl = userEntity.getProfileImageUrl();
 		}
+	}
+	
+	@Getter @Setter
+	@ToString
+	public static class UserUpdateRespDto {
+		private Long id;
+		private String username;
+		private String email;
+		private String role;
+		private String profileImageUrl;
 		
+		public UserUpdateRespDto(User userEntity) {
+			this.id = userEntity.getId();
+			this.username = userEntity.getUsername();
+			this.email = userEntity.getEmail();
+			this.role = userEntity.getRole().getValue();
+			this.profileImageUrl = userEntity.getProfileImageUrl();
+		}
 	}
 	
 }

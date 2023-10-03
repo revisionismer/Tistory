@@ -19,8 +19,10 @@ import com.tistory.domain.user.User;
 import com.tistory.domain.user.UserRepository;
 import com.tistory.dto.join.JoinReqDto;
 import com.tistory.dto.join.JoinRespDto;
+import com.tistory.dto.user.UserReqDto;
 import com.tistory.dto.user.UserRespDto.UserInfoRespDto;
 import com.tistory.dto.user.UserRespDto.UserProfileRespDto;
+import com.tistory.dto.user.UserRespDto.UserUpdateRespDto;
 import com.tistory.handler.exception.CustomApiException;
 
 import lombok.RequiredArgsConstructor;
@@ -73,7 +75,7 @@ public class UserService {
 		}
 	}
 
-	public UserProfileRespDto userProfileUpdate(Long principalId, MultipartFile profileImageFile) {
+	public UserProfileRespDto userProfilePictureUpdate(Long principalId, MultipartFile profileImageFile) {
 		// 3-1. 파일명 + 확장자 가져오기
 		String originalFileName = profileImageFile.getOriginalFilename();
 				
@@ -110,8 +112,36 @@ public class UserService {
 		
 		return new UserProfileRespDto(userEntity);
 				
-			
 	}
 	
+	public UserUpdateRespDto userUpdate(Long principalId, UserReqDto userUpdateDto) {
+		// 4-1. 로그인 유저 정보를 가져온다.
+		User userEntity = userRepository.findById(principalId).orElseThrow(() -> {
+			throw new CustomApiException("해당 유저를 찾을 수 없습니다.");
+		});
+		
+		// 4-2. 회원 정보 변경 화면에서 가져온 계정의 비밀번호를 가져온다.
+		String rawPassword = userUpdateDto.getPassword();
+		
+		// 4-3. 회원 정보 변경 화면에서 가져온 계정의 변경할 비밀번호를 가져온다.
+		String changedPassword = userUpdateDto.getConvertPassword();
+		
+		// 4-4. passwordEncoder의 matches 메소드는 인코딩된 비밀번호가 매개변수로 들어온 문자열과 일치하는지 내부적으로 확인해주고 맞으면 true, 아니면 false를 반환. 
+		if(passwordEncoder.matches(rawPassword, userEntity.getPassword())) {
+			// 4-5. 4-4를 통과했다면 계정의 원래 비밀번호를 정상적으로 맞게 입력했다는 의미이므로 변경할 비밀번호를 인코딩해서 encodedPassword에 저장한다.
+			String encodedPassword = passwordEncoder.encode(changedPassword);
+			
+			// 4-6. 전달 받은 이메일로 변경(영속화) -> 변경 감지.
+			userEntity.setEmail(userUpdateDto.getEmail());
+			
+			// 4-7. 비밀번호 변경(영속화) -> 변경 감지.
+			userEntity.setPassword(encodedPassword);
+						
+		} else {
+			throw new CustomApiException("현재 비밀번호가 일치하지 않습니다.");
+		}
+		
+		return new UserUpdateRespDto(userEntity);
+	}
 	
 }
