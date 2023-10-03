@@ -19,8 +19,10 @@ import com.tistory.domain.user.User;
 import com.tistory.dto.ResponseDto;
 import com.tistory.dto.join.JoinReqDto;
 import com.tistory.dto.join.JoinRespDto;
+import com.tistory.dto.user.UserReqDto;
 import com.tistory.dto.user.UserRespDto.UserInfoRespDto;
 import com.tistory.dto.user.UserRespDto.UserProfileRespDto;
+import com.tistory.dto.user.UserRespDto.UserUpdateRespDto;
 import com.tistory.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -55,9 +57,22 @@ public class UserApiController {
 		
 		User loginUser = principalDetails.getUser();
 		
-		UserProfileRespDto userProfileRespDto = userService.userProfileUpdate(loginUser.getId(), profileImageFile);
+		UserProfileRespDto userProfileRespDto = userService.userProfilePictureUpdate(loginUser.getId(), profileImageFile);
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, "프로필 사진 변경 성공", userProfileRespDto), HttpStatus.OK);
 	}
+	
+	@PutMapping("/s/update/info")
+	public ResponseEntity<?> updateUserInfo(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid final UserReqDto userUpdateDto, BindingResult bindingResult) {
+	
+		User loginUser = principalDetails.getUser();
+
+		UserUpdateRespDto userUpdateRespDto = userService.userUpdate(loginUser.getId(), userUpdateDto);
+
+		return new ResponseEntity<>(new ResponseDto<>(1, "회원 정보 수정 성공", userUpdateRespDto), HttpStatus.OK);	
+		
+	}
+	
+	
 
 }
