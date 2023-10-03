@@ -161,6 +161,64 @@ $(document).ready(function(){
     	}
 	}
 	
+	/**
+	 *  2-3. 회원 정보 수정 : 2023-10-01 : api 연결까지 완료
+	 */
+	$("#updateUserBtn").on("click", function(){
+
+		var convertPassword = $("#convertPassword").val();
+		var convertPassword_chk = $("#convertPassword_chk").val();
+		
+		if(convertPassword == convertPassword_chk) {
+			let formData = {
+				username : $("#username").val(),
+				password : $("#password").val(),
+				convertPassword : $("#convertPassword").val(),
+				email : $("#email").val()
+			}
+			
+			console.log(formData);
+			
+			if(ACCESS_TOKEN != null) {
+				$.ajax({
+					type : "PUT",
+					url : "/api/users/s/update/info",
+					contentType : "application/json; charset=UTF-8",
+					data: JSON.stringify(formData),
+					headers: {
+						"Authorization" : "Bearer " + ACCESS_TOKEN
+					},
+					success : function(res) {
+						console.log(res);	
+						
+						location.href = "/user/myInfo";
+					},
+					error : function(res) {
+						console.log(res);
+						
+						if(res.responseJSON.data == null) {
+							alert(res.responseJSON.message);
+						} else {
+							/* 2023-10-03 : 일단 이렇게 해놓으면 예외처리는 작동하나 수정 요망 */
+							alert(JSON.stringify(res.responseJSON.data));	
+							
+						}
+					}
+					
+				});	
+				
+			} else {
+				alert("로그인을 해주세요.");
+				location.href = "/login";
+				return;
+			}
+		} else {
+			alert("변경할 비밀번호를 한번 더 입력해주세요.");
+			return;
+		}
+		
+	});
+	
 });
 
 /* 3-1. 이미지 업로드 함수 -> 주의 : 뷰에서 직접 사용할 함수면 $(document).ready(){} 밖에 선언되어야 한다. => 2023-09-21 */
