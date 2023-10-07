@@ -29,7 +29,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 			
 			return new PrincipalDetails(userPS);
 		} else {
-			throw new InternalAuthenticationServiceException("아이디와 비밀번호를 확인해주세요.");
+			throw new InternalAuthenticationServiceException("아이디 비밀번호를 확인해주세요.");
 		} 
 		
 		/*
