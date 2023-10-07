@@ -5,17 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/post")
-public class PostController {
-
-	@GetMapping("/list")
-	public String postList() {
-		return "post/postList";
-	}
+@RequestMapping("/category")
+public class CategoryController {
 	
 	@GetMapping("/write")
-	public String postWriteForm() {
-		return "post/postForm";
+	public String categoryWriteForm() {
+		return "category/categoryForm";
 	}
-	
+
 }

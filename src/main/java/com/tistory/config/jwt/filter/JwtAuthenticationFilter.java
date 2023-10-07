@@ -194,9 +194,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		// 2-2. 응답해줄 Map형태의 객체
 		Map<String, Object> responseData = new HashMap<>();
 		
-		// 2-3. 응답 데이터 셋팅
+		// 2-3. 응답 데이터 셋팅 -> 2023-10-05 : Custom 로그인 실패처리 message 내용 변경 ex) 인증 실패 -> 아이디와 비밀번호를 확인해주세요.
 		responseData.put("code", -1);
-		responseData.put("message", "인증 실패");
+		responseData.put("message", "아이디와 비밀번호를 확인해주세요.");
 		
 		// 2-4. ObjectMapper를 이용해 json형태의 String으로 변환
 		String result = new ObjectMapper().writeValueAsString(responseData);
