@@ -50,6 +50,17 @@ if(ACCESS_TOKEN != null) {
 		success : function(res) {
 			console.log(res);	
 			
+			/**
+			 * 2-1. 회원 정보 조회 
+			 */
+			var userUpdateForm = $("#userUpdateForm").val();
+			
+			if(userUpdateForm != null) {
+				$("#userId").val(res.data.id);
+				$("#username").val(res.data.username);
+				$("#email").val(res.data.email);
+			}
+			
 			if(res.data.profileImageUrl != null) {
 				var imageUrl = `/upload/${res.data.profileImageUrl}`;
 			
@@ -60,6 +71,8 @@ if(ACCESS_TOKEN != null) {
 				
 				$('#dropdown_userImage').attr("src", imageUrl);
 			}
+			
+			$('#userProfileImage').attr("src", imageUrl);
 	
 		},
 		error : function(res) {
@@ -74,63 +87,6 @@ if(ACCESS_TOKEN != null) {
 
 
 $(document).ready(function(){
-
-	/**
-	 * 2-1. 회원 정보 조회 
-	 */
-	var userUpdateForm = $("#userUpdateForm").val();
-	
-	if(userUpdateForm != null) {
-		$("#userInfo").ready(function(){
-			
-			if(ACCESS_TOKEN != null) {
-				$.ajax({
-					type : "GET",
-					url : "/api/users/s/info",
-					contentType : "application/json; charset=UTF-8",
-					headers: {
-						"Authorization" : "Bearer " + ACCESS_TOKEN
-					},
-					success : function(res) {
-						console.log(res);	
-						
-						$("#userId").val(res.data.id);
-						$("#username").val(res.data.username);
-						$("#email").val(res.data.email);
-						
-						if(res.data.profileImageUrl != null) {
-							var imageUrl = `/upload/${res.data.profileImageUrl}`;
-						
-							console.log(imageUrl);
-							
-							$('#userProfileImage').attr("src", imageUrl);
-						
-						} else {
-							var imageUrl = `/tistory/images/dog.jpg`;
-							
-							console.log(imageUrl);
-						
-							$('#userProfileImage').attr("src", imageUrl);
-						}
-						
-							
-					},
-					error : function(res) {
-						console.log(res);
-						alert(res.responseJSON.message);
-						location.href = "/login";
-						return;
-					}
-				});	
-				
-			} else {
-				alert("로그인을 해주세요.");
-				location.href = "/login";
-				return;
-			}
-			
-		});
-	}
 		
 	/* 2-2. 비밀번호 체크  */
 	$("#convertPassword_chk").focusout(() => {
@@ -198,9 +154,17 @@ $(document).ready(function(){
 						
 						if(res.responseJSON.data == null) {
 							alert(res.responseJSON.message);
+							
+							$("#password").val("");
+							$("#convertPassword").val("");
+    						$("#convertPassword_chk").val("");
+							
 						} else {
-							/* 2023-10-03 : 일단 이렇게 해놓으면 예외처리는 작동하나 수정 요망 */
-							alert(JSON.stringify(res.responseJSON.data));	
+							if(res.responseJSON.data.password) {
+								alert(res.responseJSON.data.password);
+							} else if(res.responseJSON.data.convertPassword) {
+								alert(res.responseJSON.data.convertPassword);
+							} 
 							
 						}
 					}
