@@ -68,7 +68,7 @@ $(document).ready(function(){
 			if(ACCESS_TOKEN != null) {
 				$.ajax({
 					type : "POST",
-					url : "/api/categories/write",
+					url : "/api/admin/categories/write",
 					contentType : "application/json; charset=UTF-8",
 					data: JSON.stringify(formData),
 					headers: {
@@ -98,6 +98,31 @@ $(document).ready(function(){
 				
 			} else {
 				alert("관리자로 로그인을 해주세요.");
+				location.href = "/login";
+				return;
+			}
+		});
+	}
+	
+	var drawer_menu = $(".drawer-menu").val();
+	
+	if(drawer_menu != null) {
+		
+		$.ajax({
+			type : "GET",
+			url : "/api/categories",
+			contentType : "application/json; charset=UTF-8",
+			headers: {
+				"Authorization" : "Bearer " + ACCESS_TOKEN
+			},
+			success : function(res) {
+				for(var i = 0; i < res.data.length; i++) {
+					$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="#">${res.data[i].title}</a></li>`);
+				}
+			},
+			error : function(res) {
+				console.log(res);
+				alert(res.responseJSON.message);
 				location.href = "/login";
 				return;
 			}
