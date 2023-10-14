@@ -77,14 +77,17 @@ if(ACCESS_TOKEN != null) {
 		},
 		error : function(res) {
 			console.log(res);
+					
 			alert(res.responseJSON.message);
+			
+			// 2023-10-11 : 쿠키는 항상 도메인 주소가 루트("/")로 설정되어 있어야 모든 요청에서 사용 가능 -> 자바스크립트 단에서도 path룰 /로 재설정 해줘야함 
+			deleteCookie('access_token');	
 			location.href = "/login";
 			return;
 		}
 	});	
 	
 }
-
 
 $(document).ready(function(){
 		
@@ -154,17 +157,9 @@ $(document).ready(function(){
 						
 						if(res.responseJSON.data == null) {
 							alert(res.responseJSON.message);
-							
-							$("#password").val("");
-							$("#convertPassword").val("");
-    						$("#convertPassword_chk").val("");
-							
 						} else {
-							if(res.responseJSON.data.password) {
-								alert(res.responseJSON.data.password);
-							} else if(res.responseJSON.data.convertPassword) {
-								alert(res.responseJSON.data.convertPassword);
-							} 
+							/* 2023-10-03 : 일단 이렇게 해놓으면 예외처리는 작동하나 수정 요망 */
+							alert(JSON.stringify(res.responseJSON.data));	
 							
 						}
 					}
@@ -173,6 +168,9 @@ $(document).ready(function(){
 				
 			} else {
 				alert("로그인을 해주세요.");
+				
+				deleteCookie('access_token');
+				
 				location.href = "/login";
 				return;
 			}
@@ -245,5 +243,9 @@ function profileImageUpload() {
 		});
 		
 	});
-	
+}
+
+// 2023-10-10 : 엑세스 토큰 만료시간시 쿠키 삭제해주는 함수 -> 여기서 key 값은 'access_token'
+function deleteCookie(key) {
+	document.cookie = key + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;path=/;';
 }

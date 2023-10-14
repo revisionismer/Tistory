@@ -44,7 +44,7 @@ public class Post {
     private String content;
 
     @Column(length = 200, nullable = true)
-    private String thumnailImageUrl;
+    private String thumnailImgFileName;
 
     @JoinColumn(name = "userId")
     @ManyToOne

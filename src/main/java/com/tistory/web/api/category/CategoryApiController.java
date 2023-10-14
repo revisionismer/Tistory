@@ -1,7 +1,5 @@
 package com.tistory.web.api.category;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,7 @@ import com.tistory.config.auth.PrincipalDetails;
 import com.tistory.domain.category.Category;
 import com.tistory.domain.user.User;
 import com.tistory.dto.ResponseDto;
-import com.tistory.dto.category.CategoryReqDto;
+import com.tistory.dto.category.CategoryListRespDto;
 import com.tistory.dto.category.CategoryWriteReqDto;
 import com.tistory.dto.category.CategoryWriteRespDto;
 import com.tistory.service.category.CategoryService;
@@ -32,7 +30,7 @@ public class CategoryApiController {
 	
 	private final CategoryService categoryService;
 
-	@PostMapping("/admin/write") 
+	@PostMapping("/write") 
 	public ResponseEntity<?> createCategory(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody @Valid CategoryWriteReqDto categoryWriteReqDto, BindingResult bindingResult) {
 		
 		User loginUser = principalDetails.getUser();
@@ -44,13 +42,15 @@ public class CategoryApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "카테고리 만들기 성공", categoryWriteRespDto), HttpStatus.CREATED);
 	}
 	
+	// 2023-10-12 : 여기까지 완료
 	@GetMapping("")
-	public ResponseEntity<?> readCategoryList(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+	public ResponseEntity<?> readAllCategory(@AuthenticationPrincipal PrincipalDetails principalDetails) {
 		
 		User loginUser = principalDetails.getUser();
 		
-		List<CategoryReqDto> categories = categoryService.findAll(loginUser);
+		CategoryListRespDto categoryListRespDto = categoryService.findAllCategoryList(loginUser);
 		
-		return new ResponseEntity<>(new ResponseDto<>(1, "카테고리 리스트 불러오기 성공", categories), HttpStatus.OK);
+		return new ResponseEntity<>(new ResponseDto<>(1, "카테고리 리스트 불러오기 성공", categoryListRespDto), HttpStatus.OK);
 	}
+	
 }

@@ -68,7 +68,7 @@ $(document).ready(function(){
 			if(ACCESS_TOKEN != null) {
 				$.ajax({
 					type : "POST",
-					url : "/api/admin/categories/write",
+					url : "/api/categories/write",
 					contentType : "application/json; charset=UTF-8",
 					data: JSON.stringify(formData),
 					headers: {
@@ -78,7 +78,7 @@ $(document).ready(function(){
 						console.log(res);	
 						
 						if(res.code == 1) {
-							location.href = "/category/write";
+							location.href = "/";
 						}
 
 					},
@@ -103,31 +103,4 @@ $(document).ready(function(){
 			}
 		});
 	}
-	
-	var drawer_menu = $(".drawer-menu").val();
-	
-	if(drawer_menu != null) {
-		
-		$.ajax({
-			type : "GET",
-			url : "/api/categories",
-			contentType : "application/json; charset=UTF-8",
-			headers: {
-				"Authorization" : "Bearer " + ACCESS_TOKEN
-			},
-			success : function(res) {
-				for(var i = 0; i < res.data.length; i++) {
-					$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="#">${res.data[i].title}</a></li>`);
-				}
-			},
-			error : function(res) {
-				console.log(res);
-				alert(res.responseJSON.message);
-				location.href = "/login";
-				return;
-			}
-		});
-	}
 });
-
-
