@@ -107,6 +107,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		// 1-18. JWT 토큰 만들기 2 : claims 부분 설정(토큰 안에 담을 내용)
 		Map<String, Object> claims = new HashMap<>();;
 		claims.put("username", principalDetails.getUser().getUsername());
+		claims.put("role", principalDetails.getUser().getRole());
 		
 		// 1-19. JWT 토큰 만들기 3 : 만료 시간 설정(Access token) ->  1000 * 60L * 60L * 1 = 1시간, 500 * 60L * 60L * 1 = 30분
 		Long expiredTime = 1000 * 60L * 60L * 1;

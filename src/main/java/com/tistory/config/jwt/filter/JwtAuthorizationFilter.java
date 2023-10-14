@@ -158,6 +158,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter { // 1-1. 
 							
 						// 1-27. JWT 토큰 만들기 3 : 만료 시간 설정(Access token) ->  1000 * 60L * 60L * 1 = 1시간, 500 * 60L * 60L * 1 = 30분
 						Long expiredTime = 1000 * 60L * 60L * 1;
+//						Long expiredTime = 8 * 60L * 60L * 1;
 
 						Date date = new Date();
 						date.setTime(date.getTime() + expiredTime);

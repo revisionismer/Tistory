@@ -39,11 +39,7 @@
             </div>
 
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="/post/list">내 블로그</a>
-                <a class="dropdown-item" href="/user/myInfo">계정관리</a>
-                <a class="dropdown-item" href="/user/boards">게시판</a>
-                <a class="dropdown-item" href="/category/write">카테고리관리</a>
-                <a class="dropdown-item" href="/logout">로그아웃</a>
+            
             </div>
         </div>
 		
@@ -56,8 +52,7 @@
     <nav class="drawer-nav my_nav_slider" role="navigation" th:if="${#request.getCookies() != null}">
     	
         <ul class="drawer-menu">
-           
-    
+            <li><a class="drawer-brand" href="/">Home</a></li>
         </ul>
         
         <div class="my_nav_slider_visit">

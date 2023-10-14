@@ -82,7 +82,7 @@ public class SecurityConfig {
 				.and()
 				.authorizeRequests()  // 1-11. 인증 Request를 정의
 				.antMatchers("/api/**/s/**").authenticated()  // 1-12. /api/** 형태로 들어오는 url은 인증이 필요하다.
-				.antMatchers("/api/**/admin/**").hasRole(""  + UserEnum.ADMIN)  // 1-13. /api/admin/**을 호출하기 위해선 설정된 Role이 필요하다.
+				.antMatchers("/api/admin/**").hasRole(""  + UserEnum.ADMIN)  // 1-13. /api/admin/**을 호출하기 위해선 설정된 Role이 필요하다.
 				.anyRequest()  // 1-14. 1-12, 1-13가 아닌 요청은
 				.permitAll()  // 1-15. 모두 허용
 				.and()

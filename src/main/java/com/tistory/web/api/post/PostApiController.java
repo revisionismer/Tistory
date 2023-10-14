@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +29,20 @@ public class PostApiController {
 	
 	@PostMapping("/write")
 	public ResponseEntity<?> writePost(@AuthenticationPrincipal PrincipalDetails principalDetails, @Valid final PostWriteReqDto postWriteReqDto, BindingResult bindingResult) {
-
+		
 		User loginUser = principalDetails.getUser();
 		
 		PostWriteRespDto postWriteRespDto = postService.writePost(postWriteReqDto, loginUser);
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 글쓰기 성공", postWriteRespDto), HttpStatus.CREATED);
+	}
+	
+	
+	@GetMapping("")
+	public ResponseEntity<?> readAllPost(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+		User loginUser = principalDetails.getUser();
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", loginUser), HttpStatus.OK);
 	}
 }
