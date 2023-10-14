@@ -25,15 +25,15 @@ public class UserReqDto {
     private String username;
 
     @Size(min = 4, max = 20, message = "패스워드는 최소 4자 ~ 최대 20자까지입니다.")
-    @NotBlank(message = "비밀번호는 공백일 수 없습니다.")
+    @NotBlank
     private String password;
     
     @Size(min = 4, max = 20, message = "변경하실 패스워드는 최소 4자 ~ 최대 20자까지입니다.")
-    @NotBlank(message = "변경하실 비밀번호는 공백일 수 없습니다.")
+    @NotBlank
     private String convertPassword;
 
     @Size(min = 8, max = 60)
-    @NotBlank(message = "이메일은 공백일 수 없습니다.") // @NotNull, @NotEmpty 두개의 조합
+    @NotBlank // @NotNull, @NotEmpty 두개의 조합
     @Email
     private String email;
 

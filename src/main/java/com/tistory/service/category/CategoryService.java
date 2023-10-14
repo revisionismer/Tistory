@@ -2,7 +2,6 @@ package com.tistory.service.category;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,7 +10,7 @@ import com.tistory.constant.user.UserEnum;
 import com.tistory.domain.category.Category;
 import com.tistory.domain.category.CategoryRepository;
 import com.tistory.domain.user.User;
-import com.tistory.dto.category.CategoryReqDto;
+import com.tistory.dto.category.CategoryListRespDto;
 import com.tistory.dto.category.CategoryWriteRespDto;
 import com.tistory.handler.exception.CustomApiException;
 
@@ -39,17 +38,14 @@ public class CategoryService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<CategoryReqDto> findAll(User loginUser) {
+	public CategoryListRespDto findAllCategoryList(User loginUser) {
+		
 		List<Category> categories = categoryRepository.findAll();
 		
-		if(categories.size() != 0) {
-			List<CategoryReqDto> dtos = categories.stream().map( category -> new CategoryReqDto(category) ).collect(Collectors.toList());
-			
-			return dtos;
-			
-		} else {
-			throw new CustomApiException("카테고리를 등록해주세요.");
+		if(categories.size() == 0) {
+			throw new CustomApiException("카테고리가 존재하지 않습니다.");
 		}
 		
+		return new CategoryListRespDto(categories);
 	}
 }

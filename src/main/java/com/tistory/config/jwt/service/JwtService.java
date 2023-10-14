@@ -98,6 +98,24 @@ public class JwtService {
 		response.getWriter().write(result);
 	}
 	
+	public void sendErrorResponseByExpires(HttpServletResponse response, String message) throws IOException {
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		String result = objectMapper.writeValueAsString(new ResponseDto<>(1, message, null));
+		
+		response.setCharacterEncoding("UTF-8");
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		
+		Cookie cookie = new Cookie("access_token", null);
+		cookie.setMaxAge(0);
+		
+		response.addCookie(cookie);
+		
+		response.getWriter().write(result);
+	}
+	
 	// 1-4.
 	public boolean isNeedToUpdateAccessToken(String access_token) {
 		try {

@@ -1,5 +1,7 @@
 package com.tistory.dto.post;
 
+import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -33,12 +35,13 @@ public class PostWriteReqDto {
 	@JsonIgnore
 	private MultipartFile thumnailFile;
 	
-	public Post toEntity(String thumnailImageUrl, User principal, Category category) {
+	public Post toEntity(String thumnailImgFileName, User principal, Category category) {
         Post post = new Post();
         
         post.setTitle(title);
         post.setContent(content);
-        post.setThumnailImageUrl(thumnailImageUrl);
+        post.setThumnailImgFileName(thumnailImgFileName);
+        post.setCreatedAt(LocalDateTime.now());
         post.setUser(principal);
         post.setCategory(category);
         
