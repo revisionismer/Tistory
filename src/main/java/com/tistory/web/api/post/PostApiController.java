@@ -2,18 +2,23 @@ package com.tistory.web.api.post;
 
 import javax.validation.Valid;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tistory.config.auth.PrincipalDetails;
 import com.tistory.domain.user.User;
 import com.tistory.dto.ResponseDto;
+import com.tistory.dto.post.PostListRespDto;
 import com.tistory.dto.post.PostWriteReqDto;
 import com.tistory.dto.post.PostWriteRespDto;
 import com.tistory.service.post.PostService;
@@ -37,12 +42,13 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 글쓰기 성공", postWriteRespDto), HttpStatus.CREATED);
 	}
 	
-	
-	@GetMapping("")
-	public ResponseEntity<?> readAllPost(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+	@GetMapping("/{pageOwnerId}")
+	public ResponseEntity<?> readAllPost(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault Pageable pageable) {
 
 		User loginUser = principalDetails.getUser();
 		
-		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", loginUser), HttpStatus.OK);
+		PostListRespDto postListRespDto = postService.readPostList(pageable, loginUser, pageOwnerId, categoryId);
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
 	}
 }
