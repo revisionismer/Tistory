@@ -43,7 +43,10 @@ public class CategoryService {
 		List<Category> categories = categoryRepository.findAll();
 		
 		if(categories.size() == 0) {
-			throw new CustomApiException("카테고리가 존재하지 않습니다.");
+			Category category = new Category();
+			category.setTitle("카테고리를 등록해주세요.");
+		
+			categories.add(category);
 		}
 		
 		return new CategoryListRespDto(categories);
