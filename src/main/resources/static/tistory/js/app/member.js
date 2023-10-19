@@ -73,6 +73,12 @@ if(ACCESS_TOKEN != null) {
 			}
 			
 			$('#userProfileImage').attr("src", imageUrl);
+			
+			let my_post_list = $(".my_post_list").val();
+			
+			if(my_post_list != null) {
+				$("#userId").val(res.data.id);
+			}
 	
 		},
 		error : function(res) {

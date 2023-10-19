@@ -39,7 +39,7 @@ $(document).ready(function(){
 		var data = JSON.parse(Base64.decode(payload));
 
 		console.log(data.username);
-		
+
 		$.ajax({
 			type : "GET",
 			url : "/api/categories",
@@ -98,6 +98,90 @@ $(document).ready(function(){
 			}
 		
 		});
+		
+		/**
+		 *  4-2. 나의 포스팅 정보 불러오기
+		 **/
+		let my_post_list = $(".my_post_list").val();
+		
+		// 4-3. 토큰 속에 들어가있는 id값을 Number 형으로 바꿔서 가져온다.
+		let principalId = Number(data.id);
+
+		if(my_post_list != null) {
+
+			$.ajax({
+				type : "GET",
+				url : `/api/posts/${principalId}`,
+				contentType : "application/json; charset=UTF-8",
+				headers: {
+					"Authorization" : "Bearer " + ACCESS_TOKEN
+				},
+				success : function(res) {
+					console.log(res);	
+					
+					// 2023-10-17 -> 여기까지(포스팅 데이터를 들고와서 뿌려봄)
+					
+					var html = ``;
+					
+					if(!res.data.posts.content.length) {
+						html = '<p> colspan="53">등록된 포스팅이 없습니다.</p>';
+					} else {
+						for(var i = 0; i < res.data.posts.content.length; i++) {
+							html += `
+								<div class="my_post_list_item">
+									<div class="my_post_list_item_left">
+							`;
+							
+							if(res.data.posts.content[i].thumnailImgFileName == null) {
+								html += `
+									<img id="p_thumnail" src="/tistory/images/dog.jpg" width="150" height="150">
+										<!--	<div class="my_fakeimg"></div>  -->
+									</div>
+								`;
+							} else {
+								html += `
+									<img id="p_thumnail" src="/thumnail/${res.data.posts.content[i].thumnailImgFileName}" width="150" height="150">
+										<!--	<div class="my_fakeimg"></div>  -->
+									</div>
+								`;
+							}
+							
+							html += `
+										
+									<div class="my_post_list_item_right my_ellipsis">
+										<div id="p_title" class="my_text_title my_ellipsis">${res.data.posts.content[i].title}</div>
+										<div id="p_content" class="my_text_body_sm">${res.data.posts.content[i].content}</div>
+	                	
+										<div class="my_mt_md_1">
+	     
+	                    					<a href="" class="my_success_btn">Read More</a> 
+										</div>
+									</div>
+								</div>
+
+							`;
+									
+						}
+
+						document.getElementById('postList').innerHTML = html;
+						
+						
+					}
+				
+						
+				},
+				error : function(res) {
+					console.log(res);
+							
+					alert(res.responseJSON.message);
+					
+					// 2023-10-11 : 쿠키는 항상 도메인 주소가 루트("/")로 설정되어 있어야 모든 요청에서 사용 가능 -> 자바스크립트 단에서도 path룰 /로 재설정 해줘야함 
+					deleteCookie('access_token');	
+					location.href = "/login";
+					return;
+				}
+			});
+		}
 			
 	}
 	/**
@@ -176,5 +260,9 @@ $(document).ready(function(){
 			});	
 		}
 	});
-	
 });
+
+//2023-10-10 : 엑세스 토큰 만료시간시 쿠키 삭제해주는 함수 -> 여기서 key 값은 'access_token'
+function deleteCookie(key) {
+	document.cookie = key + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;path=/;';
+}

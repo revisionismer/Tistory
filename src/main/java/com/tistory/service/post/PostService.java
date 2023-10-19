@@ -3,10 +3,14 @@ package com.tistory.service.post;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -16,6 +20,9 @@ import com.tistory.domain.category.CategoryRepository;
 import com.tistory.domain.post.Post;
 import com.tistory.domain.post.PostRepository;
 import com.tistory.domain.user.User;
+import com.tistory.domain.visit.Visit;
+import com.tistory.domain.visit.VisitRepository;
+import com.tistory.dto.post.PostListRespDto;
 import com.tistory.dto.post.PostWriteReqDto;
 import com.tistory.dto.post.PostWriteRespDto;
 import com.tistory.handler.exception.CustomApiException;
@@ -32,6 +39,7 @@ public class PostService {
 	
 	private final PostRepository postRepository;
 	private final CategoryRepository categoryRepository;
+	private final VisitRepository visitRepository;
 	
 	public PostWriteRespDto writePost(PostWriteReqDto postWriteReqDto, User loginUser) {
 		String thumnail = null;
@@ -87,5 +95,73 @@ public class PostService {
 			throw new CustomApiException("해당 카테고리가 존재하지 않습니다.");
 		}
 		
+	}
+	
+	public PostListRespDto readPostList(Pageable pageable, User loginUser, Long pageOwnerId, Long categoryId) {
+		// 2-1. 
+		Page<Post> posts = null;
+		
+		if(categoryId == null) {
+			posts = postRepository.findByUserId(pageOwnerId, pageable);
+					
+	    } else {
+	    	// 2-2. 검색용
+	    	posts = postRepository.findByUserIdAndCategoryId(pageOwnerId, categoryId, pageable);
+	    }
+	        
+		// 2-3. 
+		List<Category> categories = categoryRepository.findAll();
+		
+		// 2-4.
+		List<Integer> pageNumbers = new ArrayList<>();
+		
+		// 2-5. 뷰로 보낼 pageNumber 데이터를 0부터 시작하는게 아니라 1부터 시작하게 +1해준다.
+        for (int i = 0; i < posts.getTotalPages(); i++) {
+            pageNumbers.add(i + 1);
+        }
+        
+        // 2-6.
+        Visit visitEntity = visitIncrease(pageOwnerId, loginUser.getId());
+        
+        // 2-7.
+        PostListRespDto postListRespDto = new PostListRespDto(
+        		posts, 
+        		categories, 
+        		pageOwnerId, 
+        		posts.getNumber() - 1, 
+        		posts.getNumber() + 1, 
+        		pageNumbers, 
+        		visitEntity.getTotalCount(), 
+        		(posts.getNumber() - 1) != -1 ? true : false, 
+        		(posts.getNumber() + 1) != posts.getTotalPages() ? true : false, 
+        		(posts.getContent().size() == 0) ? true : false
+        );
+        
+		return postListRespDto;
+	}
+	
+	private Visit visitIncrease(Long pageOwnerId, Long principalId) {	
+		// 3-1. 회원가입시 만들어진 방문 엔티티를 페이지 주인의 id로 찾아온다.
+        Optional<Visit> visitOp = visitRepository.findById(pageOwnerId);
+        
+        // 3-2. 페이지 주인의 방문엔티티가 존재한다면
+        if (visitOp.isPresent()) {
+        	// 3-3. 엔티티를 가져와서
+            Visit visitEntity = visitOp.get();
+            
+            // 3-4. 전체 방문수를 가져온다.
+            Long totalCount = visitEntity.getTotalCount();
+            
+            // 3-5. 페이지주인의 아이디와 로그인한 회원의 아이디가 다를때만
+            if(pageOwnerId != principalId) {
+            	// 3-6. 방문자 수를 1씩 증가시켜준다.
+                visitEntity.setTotalCount(totalCount + 1L);
+            }
+            
+            return visitEntity;
+            
+        } else {
+            throw new CustomApiException("일시적 문제가 생겼습니다. 관리자에게 문의해주세요.");
+        }
 	}
 }

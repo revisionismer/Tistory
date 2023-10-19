@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.tistory.domain.user.User;
 import com.tistory.domain.user.UserRepository;
+import com.tistory.domain.visit.Visit;
+import com.tistory.domain.visit.VisitRepository;
 import com.tistory.dto.join.JoinReqDto;
 import com.tistory.dto.join.JoinRespDto;
 import com.tistory.dto.user.UserReqDto;
@@ -35,7 +37,7 @@ public class UserService {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private final UserRepository userRepository;
-	
+	private final VisitRepository visitRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
 	
 	// 3-5. 실제 파일이 저장될 경로
@@ -55,9 +57,15 @@ public class UserService {
 		// 1-2. 패스워드 인코딩 + 회원가입
 		User userPS = userRepository.save(joinReqDto.toEntity(passwordEncoder));
 		
+		// 1-3. Visit 엔티티 생성
+		Visit visit = new Visit(0L, userPS);
+		
+		visitRepository.save(visit);
+		
 		// 1-3. dto 응답
 		return new JoinRespDto(userPS);
 	}
+	
 	
 	@Transactional(readOnly = true)
 	public UserInfoRespDto userInfo(User loginUser) {
