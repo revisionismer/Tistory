@@ -34,3 +34,11 @@
 .my_text_body_sm {
     font-size: 10px;
 }
+
+a:link {
+	text-decoration: none;
+}
+
+a:hover {
+	cursor: pointer;
+}

@@ -45,6 +45,9 @@ public class Post {
 
     @Column(length = 200, nullable = true)
     private String thumnailImgFileName;
+    
+    @Column(length = 200, nullable = true)
+    private String originalImgFileName;
 
     @JoinColumn(name = "userId")
     @ManyToOne

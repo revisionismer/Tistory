@@ -83,11 +83,13 @@ if(ACCESS_TOKEN != null) {
 		},
 		error : function(res) {
 			console.log(res);
+
+			// 2023-10-20 -> ajax error 처리(access_token 만료)는 deleteCookie를 하려는 곳은 유저 정보를 불러올때만 동작하게 처리(한번만)
+			// 2023-10-11 : 쿠키는 항상 도메인 주소가 루트("/")로 설정되어 있어야 모든 요청에서 사용 가능 -> 자바스크립트 단에서도 path룰 /로 재설정 해줘야함 
+			deleteCookie('access_token');	
 					
 			alert(res.responseJSON.message);
 			
-			// 2023-10-11 : 쿠키는 항상 도메인 주소가 루트("/")로 설정되어 있어야 모든 요청에서 사용 가능 -> 자바스크립트 단에서도 path룰 /로 재설정 해줘야함 
-			deleteCookie('access_token');	
 			location.href = "/login";
 			return;
 		}
