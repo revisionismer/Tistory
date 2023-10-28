@@ -26,16 +26,16 @@
 	
 	<!-- // container -->
 	<div class="container">
-	<input id="postId" type="hidden" value="" />
+
     <input id="pageOwnerId" type="hidden" value="" />
     <input id="my-loveId" type="hidden" value=""/>
     <input id="content" type="hidden" value=""/>
     <input id="post" type="hidden" value=""/>
-    <input id="principalId" type="hidden" value="" />
-    <input id="postId" type="hidden" value=""/>
+    <input id="principalId" type="hidden" th:value="${principalId}" />
+    <input id="postId" type="hidden" th:value="${postId}"/>
     <input id="category_id" type="hidden" value=""/>
 
-    <form id="postWriteForm" method="post" enctype="multipart/form-data" onsubmit="return getQuill()">
+    <form id="postForm" method="post" enctype="multipart/form-data" onsubmit="return getQuill()">
 
         <div class="form-group">
         	
@@ -97,71 +97,69 @@
         <textarea name="content" id="content" class="my_hidden"></textarea>
 
         <div class="form-control d-flex justify-content-end">
-       
-            <div>섬네일 사진 등록 : <input type="file" id="thumnailFile" name="thumnailFile"></div>
-        
+       		
+            <div id="thumnailImgArea">
+            	섬네일 사진 등록 : <input type="file" id="thumnailFile" name="thumnailFile">
+            </div>
+    
         </div>
      
-       
-    	</form>
-    	<div  id="postBtn">
-    		<button id="writeBtn" class="my_active_btn" onclick="">쓰기</button>
-   			<button id="modifyBtn" class="my_active_btn" onclick="">수정</button>
-   			<button id="cancelBtn" class="my_active_btn" onclick="cancelBtn();">취소</button>
-   		</div>
-    	<br />
+    </form>
+    <div id="postBtn">
+    	<button th:if="${postId == null}" id="writeBtn" class="my_active_btn" onclick="">쓰기</button>
+   		<button th:if="${postId != null}" id="modifyBtn" class="my_active_btn" onclick="">수정</button>
+   		<button id="cancelBtn" class="my_active_btn" onclick="cancelBtn();">취소</button>
+   	</div>
+    <br />
 		
-	</div>
-	<!-- container // -->
+</div>
+<!-- container // -->
 	
+<div th:replace="fragments/footer :: footer"></div>
+<!-- jquery.min.js -->
+<script src="/tistory/js/jquery.min.js"></script>
+<script type="text/javascript">
+	var data = $("#content").val();
 	
-	
-	<div th:replace="fragments/footer :: footer"></div>
-	<!-- jquery.min.js -->
-	<script src="/tistory/js/jquery.min.js"></script>
-	<script type="text/javascript">
-		var data = $("#content").val();
-	
-		function getQuill() {
+	function getQuill() {
 			
-       		let quillContent = $("#editor-container .ql-editor").html();
+       	let quillContent = $("#editor-container .ql-editor").html();
     	
-        	$("#content").html(quillContent);
+        $("#content").html(quillContent);
         
-        	return true;
-    	}
+        return true;
+    }
 
-		if(data == null) {
+	if(data == null) {
 	
-    		var quill = new Quill('#editor-container', {
-        		modules: {
-            		formula: true,
-            		syntax: true,
-            		toolbar: '#toolbar-container'
-        		},
-        		placeholder: '게시물을 작성해주세요.',
-        		theme: 'snow'
-    		});
-    	} else {
+    	var quill = new Quill('#editor-container', {
+        	modules: {
+            	formula: true,
+            	syntax: true,
+            	toolbar: '#toolbar-container'
+        	},
+        	placeholder: '게시물을 작성해주세요.',
+        	theme: 'snow'
+    	});
+    } else {
     	
-    		var quill = new Quill('#editor-container', {
-        		modules: {
-            		formula: true,
-            		syntax: true,
-            		toolbar: '#toolbar-container'
-        		},
-        		theme: 'snow'
-    		});
+    	var quill = new Quill('#editor-container', {
+        	modules: {
+            	formula: true,
+            	syntax: true,
+            	toolbar: '#toolbar-container'
+        	},
+        	theme: 'snow'
+    	});
     	
-    		quill.setContents([
-  				{ insert: data.replace(/<[^>]*>?/g, '') }
-			]);
-    	}
+    	quill.setContents([
+  			{ insert: data.replace(/<[^>]*>?/g, '') }
+		]);
+    }
 		
+	function cancelBtn() {
+		window.history.back();
+	}
 		
-		function cancelBtn() {
-			location.href = "/index";
-		}
-		
-	</script>
+</script>
 </html>
