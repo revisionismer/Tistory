@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <div class="header" th:fragment="bodyHeader">
-    <input type="hidden" id="principalId" value="" />
- 	
     <nav class="navbar navbar-expand-sm my_navbar" >
 
         <a href="/" th:if="${#request.getCookies() == null}">
