@@ -69,7 +69,7 @@ public class UserApiController {
 
 		UserUpdateRespDto userUpdateRespDto = userService.userUpdate(loginUser.getId(), userUpdateDto);
 
-		return new ResponseEntity<>(new ResponseDto<>(1, "회원 정보 수정 성공", userUpdateRespDto), HttpStatus.OK);	
+		return new ResponseEntity<>(new ResponseDto<>(1, "회원 정보 수정 성공", userUpdateRespDto), HttpStatus.ACCEPTED);	
 		
 	}
 	
