@@ -71,6 +71,6 @@ public class PostApiController {
 		
 		PostWriteRespDto postWriteRespDto = postService.updatePost(pageOwnerId, postId, postWriteReqDto, loginUser);
 		
-		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 수정 성공", postWriteRespDto), HttpStatus.CREATED);
+		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 수정 성공", postWriteRespDto), HttpStatus.ACCEPTED);
 	}
 }
