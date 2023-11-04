@@ -44,12 +44,20 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 글쓰기 성공", postWriteRespDto), HttpStatus.CREATED);
 	}
 	
+	@GetMapping("")
+	public ResponseEntity<?> readAllPost(@RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 5) Pageable pageable) {
+	
+		PostListRespDto postListRespDto = postService.readPostList(categoryId, pageable);
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
+	}
+	
 	@GetMapping("/{pageOwnerId}")
-	public ResponseEntity<?> readAllPost(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 5) Pageable pageable) {
+	public ResponseEntity<?> readAllPostByPageOwnerId(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 5) Pageable pageable) {
 
 		User loginUser = principalDetails.getUser();
 		
-		PostListRespDto postListRespDto = postService.readPostList(pageable, loginUser, pageOwnerId, categoryId);
+		PostListRespDto postListRespDto = postService.readPostListByPageOwnerId(pageable, loginUser, pageOwnerId, categoryId);
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
 	}

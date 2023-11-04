@@ -28,3 +28,11 @@
     margin-bottom: 5px;
 }
 
+#not_post_data_msg {
+	text-align: center;
+	padding-bottom: 15px;
+}
+
+#my_main_list .my_main_item {
+	padding-bottom: 10px;
+}

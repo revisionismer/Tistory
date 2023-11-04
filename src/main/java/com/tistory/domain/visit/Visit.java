@@ -13,6 +13,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tistory.domain.user.User;
 
 import lombok.AllArgsConstructor;
@@ -40,8 +41,10 @@ public class Visit {
     @ManyToOne
     private User user;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createDate;
     
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime updateDate;
 
     @PrePersist 

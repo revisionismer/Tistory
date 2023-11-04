@@ -106,6 +106,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		
 		// 1-18. JWT 토큰 만들기 2 : claims 부분 설정(토큰 안에 담을 내용)
 		Map<String, Object> claims = new HashMap<>();;
+		claims.put("id", principalDetails.getUser().getId());
 		claims.put("username", principalDetails.getUser().getUsername());
 		claims.put("role", principalDetails.getUser().getRole());
 		
