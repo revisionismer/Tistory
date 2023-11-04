@@ -19,6 +19,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tistory.constant.user.UserEnum;
 import com.tistory.handler.exception.CustomValidationException;
 
@@ -57,10 +58,12 @@ public class User {
 	
  // 1-14. JPA LocalDateTime 자동 생성 방법 3 : LocalDateTime에 @CreatedDate, @LastModifiedDate 어노테이션을 걸어준다.
  	@CreatedDate
+ 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	@Column(nullable = false)
  	private LocalDateTime createdAt;  // 1-10. 생성일
  	 
  	@LastModifiedDate
+ 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	@Column(nullable = true)
  	private LocalDateTime updatedAt;  // 1-11. 수정일
  	
