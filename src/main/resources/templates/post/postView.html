@@ -27,11 +27,11 @@
 	<!-- // container -->
 	<div class="container">
 
-    <input id="pageOwnerId" type="hidden" value=""/>
+    <input id="pageOwnerId" type="hidden" value="${pageOwnerId}"/>
     <input id="my-loveId" type="hidden" value=""/>
     <input id="content" type="hidden" value=""/>
     <input id="post" type="hidden" value=""/>
-    <input id="principalId" type="hidden" th:value="${principalId}" />
+    <input id="principalId" type="hidden" value="" />
     <input id="postId" type="hidden" th:value="${postId}"/>
     <input id="category_id" type="hidden" value=""/>
 
@@ -46,7 +46,7 @@
         </div>
         <br/>
        
-        <input type="text" id="title" name="title" class="form-control" placeholder="Enter Title" >
+        <input type="text" id="title" name="title" class="form-control" placeholder="Enter Title" readonly="readonly">
 
         <div id="toolbar-container">
             <span class="ql-formats">
@@ -99,15 +99,15 @@
         <div class="form-control d-flex justify-content-end">
        		
             <div id="thumnailImgArea">
-            	섬네일 사진 등록 : <input type="file" id="thumnailFile" name="thumnailFile">
+            	
             </div>
     
         </div>
      
     </form>
     <div id="postBtn">
-    	<button th:if="${postId == null}" id="writeBtn" class="my_active_btn" onclick="">쓰기</button>
-   		<button th:if="${postId != null}" id="modifyBtn" class="my_active_btn" onclick="">수정</button>
+    	<button th:if="${postId == null && principalId != null}" id="writeBtn" class="my_active_btn" onclick="">쓰기</button>
+   		<button th:if="${postId != null && principalId != null}" id="modifyBtn" class="my_active_btn" onclick="">수정</button>
    		<button id="cancelBtn" class="my_active_btn" onclick="cancelBtn();">취소</button>
    	</div>
     <br />
@@ -149,7 +149,8 @@
             	syntax: true,
             	toolbar: '#toolbar-container'
         	},
-        	theme: 'snow'
+        	theme: 'snow',
+        	readOnly: true
     	});
     	
     	quill.setContents([

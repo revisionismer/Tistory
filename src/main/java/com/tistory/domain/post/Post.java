@@ -17,6 +17,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tistory.domain.category.Category;
 import com.tistory.domain.user.User;
 
@@ -59,10 +60,12 @@ public class Post {
     
     @CreatedDate
  	@Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	private LocalDateTime createdAt;
  	 
  	@LastModifiedDate
  	@Column(nullable = true)
+ 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	private LocalDateTime updatedAt; 
  	
  	@Builder

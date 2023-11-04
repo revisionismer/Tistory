@@ -21,7 +21,119 @@ $(document).ready(function(){
 	}
 
 	console.log(ACCESS_TOKEN);
+	
+	/**
+	 *  4-10. 전체 포스팅 보기(main 화면) : 로그인 안해도 보여야하고 로그인한 회원의 posting데이터만 나오는게 아니라 전체  회원 데이터가 다 보여야함(그래서 ACCESS_TOKEN 영역 바깥으로 뺌)
+	 	2023-11-01 : 여기까지. 메인 화면에 전체 포스팅 데이터 불러와서 뿌려주는거까지 성공
+	 */
+	let my_main_list = $("#my_main_list").val();
+	
+	if(my_main_list != null) {
+		var search = location.search;
+		
+		var params = new URLSearchParams(search);
+		
+		var getType = params.get('categoryId');
+		
+		var url;
+		
+		if(getType == null || getType == 0) {
+			url = "/api/posts";
+		} else {
+			url = "/api/posts?categoryId=" + getType;
+		}
+		
+		console.log("ACCESS_TOKEN : " + ACCESS_TOKEN);
+		
+		var principalId = -1;
+		
+		if(ACCESS_TOKEN != null) {
+			var header = ACCESS_TOKEN.split('.')[0];
+			var payload = ACCESS_TOKEN.split('.')[1];
+			var signature = ACCESS_TOKEN.split('.')[2];
+					
+			console.log(header);
+			console.log(payload);
+			console.log(signature);
+					
+			console.log("복호화 : " + Base64.decode(payload));
+					
+			// 2023-02-12 -> 토큰에 있는 payload에 실어논 정보를 Base64로 디코드해서 가져와 세팅(base64.min.js 필요)
+			var data = JSON.parse(Base64.decode(payload));
 
+			principalId = Number(data.id);
+		}
+		
+		console.log("principalId : " + principalId);
+		
+		$.ajax({
+			type : "GET",
+			url : url,
+			contentType : "application/json; charset=UTF-8",
+			success : function(res) {
+				console.log(res);	
+				
+				var html = ``;
+				
+				if(!res.data.posts.content.length) {
+					html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
+				} else {
+					for(var i = 0; i < res.data.posts.content.length; i++) {
+						html += `
+							<div id="my_main_item_${res.data.posts.content[i].id}" class="my_main_item">
+								<a onclick="postInfo(${res.data.posts.content[i].user.id}, ${principalId} ,${res.data.posts.content[i].id})" class="my_atag_none">
+						
+						`;
+						if(res.data.posts.content[i].thumnailImgFileName == null) {
+							html += `
+								<div class="my_main_item_thumnail">
+									<img src="/tistory/images/dog.jpg" width="100%" height="100%">
+								</div>
+							`;
+						} else {
+							html += `
+								<div class="my_main_item_thumnail">
+									<img src="/thumnail/${res.data.posts.content[i].thumnailImgFileName}" width="100%" height="100%">
+								</div>
+							`;
+						}
+							html += `
+									<div class="my_main_content my_p_sm_1">
+										<div class="my_main_item_title">
+											<h3>제목 : ${res.data.posts.content[i].title}</h3>
+										</div>
+										<div class="my_main_item_summary my_mb_sm_1 my_text_two_line">
+											내용 : ${res.data.posts.content[i].content}
+										</div>
+										<div class="my_main_item_date my_mb_sm_1">
+											날짜 : ${res.data.posts.content[i].createdAt}
+										</div>
+									</div>
+								</a>
+								<a href="#" class="my_atag_none">
+									<div class="my_main_item_username">
+										<span>by </span>
+										<b>${res.data.posts.content[i].user.username}</b>
+									</div>
+								</a>
+								
+							</div>
+						`;
+							
+					}
+				}
+				
+				document.getElementById('my_main_list').innerHTML = html;
+					
+			},
+			error : function(res) {
+				console.log(res);
+
+			}
+		});
+	
+	}
+	
 	if(ACCESS_TOKEN != null) {
 		console.log(ACCESS_TOKEN);
 				
@@ -39,7 +151,7 @@ $(document).ready(function(){
 		var data = JSON.parse(Base64.decode(payload));
 
 		console.log(data.username);
-
+		
 		$.ajax({
 			type : "GET",
 			url : "/api/categories",
@@ -53,7 +165,8 @@ $(document).ready(function(){
 				
 				// 2023-10-13 : 여기까지
 				for(var i = 0; i < res.data.categories.length; i++) {
-					$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="#">${res.data.categories[i].title}</a></li>`);
+					
+					$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="/index?categoryId=${res.data.categories[i].categoryId}">${res.data.categories[i].title}</a></li>`);
 				}
 				
 				for(var i = 0; i < res.data.categories.length; i++) {
@@ -93,7 +206,7 @@ $(document).ready(function(){
 			}
 		
 		});
-		
+				
 		/**
 		 *  4-2. 나의 포스팅 정보 불러오기
 		 **/
@@ -111,7 +224,6 @@ $(document).ready(function(){
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
 				},
-				async : false,
 				success : function(res) {
 					console.log(res);	
 					
@@ -120,7 +232,7 @@ $(document).ready(function(){
 					var html = ``;
 					
 					if(!res.data.posts.content.length) {
-						html = '<p> colspan="53">등록된 포스팅이 없습니다.</p>';
+						html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
 					} else {
 						for(var i = 0; i < res.data.posts.content.length; i++) {
 							html += `
@@ -255,7 +367,6 @@ $(document).ready(function(){
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
 				},
-				async : false,
 				success : function(res) {
 					console.log(res);	
 					
@@ -401,7 +512,6 @@ $(document).ready(function(){
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
 				},
-				async : false,
 				success : function(res) {
 					console.log(res);	
 					
@@ -549,7 +659,6 @@ $(document).ready(function(){
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
 				},
-				async : false,
 				success : function(res) {
 					console.log(res);	
 					
@@ -935,6 +1044,16 @@ function detailPost(principalId, postId) {
 	document.body.appendChild(form);
 	form.submit();
 
+}
+
+
+/**
+ * 4-11. 포스팅 정보 보기(남의꺼 포스팅도 보기 가능) : 주의 : ajax로 동적으로 생성된 태그에 함수를 적용하려면 $(document).ready 밖에서 선언해야된다. 
+ * 2023-11-02 : 변수 연결까지 해놓음(filter에 처음 로그인시에 토큰 값에 id값을 안넣어줘서 문제가 생겼었음)
+ */
+function postInfo(pageOwnerId, principalId, postId) {
+	console.log("고민 해보자 : " + pageOwnerId + ", " + principalId + ", " + postId);
+	
 }
 
 //2023-10-10 : 엑세스 토큰 만료시간시 쿠키 삭제해주는 함수 -> 여기서 key 값은 'access_token'

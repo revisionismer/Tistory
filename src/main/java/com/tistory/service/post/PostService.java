@@ -103,7 +103,44 @@ public class PostService {
 		
 	}
 	
-	public PostListRespDto readPostList(Pageable pageable, User loginUser, Long pageOwnerId, Long categoryId) {
+	public PostListRespDto readPostList(Long categoryId, Pageable pageable) {
+		
+		Page<Post> posts = null;
+		
+		if(categoryId == null) {
+			posts = postRepository.findAllPost(pageable);
+			
+	    } else {
+	    	// 2-2. 검색용
+	    	posts = postRepository.findAllByCategoryId(categoryId, pageable);
+	    }
+		
+		List<Category> categories = categoryRepository.findAll();
+		
+		List<Integer> pageNumbers = new ArrayList<>();
+		
+		for (int i = 0; i < posts.getTotalPages(); i++) {
+			pageNumbers.add(i + 1);
+	    }
+		
+		PostListRespDto postListRespDto = new PostListRespDto(
+        		posts, 
+        		categories, 
+        		null, 
+        		posts.getNumber() - 1, 
+        		posts.getNumber() + 1, 
+        		pageNumbers, 
+        		null, 
+        		(posts.getNumber() - 1) != -1 ? true : false, 
+        		(posts.getNumber() + 1) != posts.getTotalPages() ? true : false, 
+        		(posts.getContent().size() == 0) ? true : false
+        );
+        
+		return postListRespDto;
+		
+	}
+	
+	public PostListRespDto readPostListByPageOwnerId(Pageable pageable, User loginUser, Long pageOwnerId, Long categoryId) {
 		// 2-1. 
 		Page<Post> posts = null;
 		
@@ -146,6 +183,7 @@ public class PostService {
 		return postListRespDto;
 	}
 	
+	// 2023-11-02 
 	public PostInfoRespDto readPostInfo(Long pageOwnerId, Long postId, User loginUser) {
 		
 		Optional<Post> postOp = postRepository.findById(postId);
@@ -155,9 +193,8 @@ public class PostService {
 			
 			PostInfoRespDto postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == loginUser.getId() ? true : false);
 			
+			System.out.println(pageOwnerId + ", " + loginUser.getId());
 			visitIncrease(pageOwnerId, loginUser.getId());
-			
-			System.out.println(pageOwnerId + "," + loginUser.getId());
 			
 			return postInfoRespDto;
 			

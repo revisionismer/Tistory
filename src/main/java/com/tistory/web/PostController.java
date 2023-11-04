@@ -23,6 +23,9 @@ public class PostController {
 	
 	@PostMapping("/detail")
 	public String postDetail(@RequestParam("principalId") Long principalId, @RequestParam("postId") Long postId, Model model) {
+		
+		System.out.println("principalId : " + principalId + ", postId = " + postId);
+		
 		model.addAttribute("principalId", principalId);
 		model.addAttribute("postId", postId);
 		

@@ -16,6 +16,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tistory.domain.user.User;
 
 import lombok.Builder;
@@ -43,10 +44,12 @@ public class Category {
     private User user;
     
     @CreatedDate
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	@Column(nullable = false)
  	private LocalDateTime createdAt;
  	 
  	@LastModifiedDate
+ 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
  	@Column(nullable = true)
  	private LocalDateTime updatedAt; 
  	
