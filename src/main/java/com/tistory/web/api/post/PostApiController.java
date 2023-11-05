@@ -45,7 +45,7 @@ public class PostApiController {
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> readAllPost(@RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 5) Pageable pageable) {
+	public ResponseEntity<?> readAllPost(@RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 6) Pageable pageable) {
 	
 		PostListRespDto postListRespDto = postService.readPostList(categoryId, pageable);
 		
@@ -53,7 +53,7 @@ public class PostApiController {
 	}
 	
 	@GetMapping("/{pageOwnerId}")
-	public ResponseEntity<?> readAllPostByPageOwnerId(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 5) Pageable pageable) {
+	public ResponseEntity<?> readAllPostByPageOwnerId(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 6) Pageable pageable) {
 
 		User loginUser = principalDetails.getUser();
 		
