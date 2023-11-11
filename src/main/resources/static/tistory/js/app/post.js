@@ -25,6 +25,7 @@ $(document).ready(function(){
 	/**
 	 *  4-10. 전체 포스팅 보기(main 화면) : 로그인 안해도 보여야하고 로그인한 회원의 posting데이터만 나오는게 아니라 전체  회원 데이터가 다 보여야함(그래서 ACCESS_TOKEN 영역 바깥으로 뺌)
 	 	2023-11-01 : 여기까지. 메인 화면에 전체 포스팅 데이터 불러와서 뿌려주는거까지 성공
+	 	2023-11-08 : main에 뿌려지는 포스팅 데이터들 중에 a 태그에 href가 기본적으로 #으로 박혀있는 부분들을 전부 제거해줌(페이징 클릭시 #이 붙어서 이동함)
 	 */
 	let my_main_list = $("#my_main_list").val();
 	
@@ -121,9 +122,73 @@ $(document).ready(function(){
 						`;
 							
 					}
+					
+					html += `
+						
+					`;
 				}
 				
 				document.getElementById('my_main_list').innerHTML = html;
+				
+				html = ``;
+				
+				if(res.data.isFirst) {
+					html += `
+						<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+							<a class="my_atag_none my_mr_sm_1" id="main_prev">
+								<i class="fa-solid fa-angle-left"></i>
+							</a>
+
+							<a class="my_atag_none_1">
+								<div class="my_paging_number_box my_mr_sm_1_1">
+									1
+								</div>
+							</a>
+
+							<a class="my_atag_none my_ml_sm_1">
+								<i class="fa-solid fa-angle-right"></i>
+							</a>
+						</div>	
+					`;
+				} else {
+					html += `
+						<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+					`;
+					
+					if(res.data.isPrev) {
+						html += `
+							<a class="my_atag_none my_mr_sm_1" id="main_prev">
+								<i class="fa-solid fa-angle-left"></i>
+							</a>
+						`;
+					}
+					for(var i = 0; i < res.data.posts.totalPages; i++) {
+						html += `
+								<a class="my_atag_none_1">
+									<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+										${i+1}
+									</div>
+								</a>
+							`;
+					}
+					
+					if(res.data.isNext) {
+						html += `
+					
+							<a class="my_atag_none my_ml_sm_1" id="main_next">
+								<i class="fa-solid fa-angle-right"></i>
+							</a>
+						`;
+					}
+					
+					html += `
+						</div>	
+						
+					`;
+				}
+				
+				document.getElementById('pagination').innerHTML = html;
+				
 					
 			},
 			error : function(res) {
@@ -131,7 +196,550 @@ $(document).ready(function(){
 
 			}
 		});
+		
+		/**
+		 * 	4-11. 메인 페이지 페이징(현재 페이지)
+		 * 
+		 **/
+		$(document).on('click', '#main_page', function(e){
+			
+			e.preventDefault();
+			
+			var main_page = e.currentTarget.innerText - 1;
+			
+			var url = "/api/posts?page=" + main_page; 
+			
+			$.ajax({
+				type : "GET",
+				url : url,
+				contentType : "application/json; charset=UTF-8",
+				success : function(res) {
+					console.log(res);	
+					
+					var html = ``;
+					
+					if(!res.data.posts.content.length) {
+						html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
+					} else {
+						for(var i = 0; i < res.data.posts.content.length; i++) {
+							html += `
+								<div id="my_main_item_${res.data.posts.content[i].id}" class="my_main_item">
+									<a onclick="postInfo(${res.data.posts.content[i].user.id}, ${principalId} ,${res.data.posts.content[i].id})" class="my_atag_none">
+							
+							`;
+							if(res.data.posts.content[i].thumnailImgFileName == null) {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/tistory/images/dog.jpg" width="100%" height="100%">
+									</div>
+								`;
+							} else {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/thumnail/${res.data.posts.content[i].thumnailImgFileName}" width="100%" height="100%">
+									</div>
+								`;
+							}
+								html += `
+										<div class="my_main_content my_p_sm_1">
+											<div class="my_main_item_title">
+												<h3>제목 : ${res.data.posts.content[i].title}</h3>
+											</div>
+											<div class="my_main_item_summary my_mb_sm_1 my_text_two_line">
+												내용 : ${res.data.posts.content[i].content}
+											</div>
+											<div class="my_main_item_date my_mb_sm_1">
+												날짜 : ${res.data.posts.content[i].createdAt}
+											</div>
+										</div>
+									</a>
+									<a href="#" class="my_atag_none">
+										<div class="my_main_item_username">
+											<span>by </span>
+											<b>${res.data.posts.content[i].user.username}</b>
+										</div>
+									</a>
+									
+								</div>
+							`;
+								
+						}
+						
+						html += `
+							
+						`;
+					}
+					
+					document.getElementById('my_main_list').innerHTML = html;
+					
+					html = ``;
+					
+					if(res.data.isFirst) {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+
+								<a class="my_atag_none_1">
+									<div class="my_paging_number_box my_mr_sm_1_1">
+										1
+									</div>
+								</a>
+
+								<a class="my_atag_none my_ml_sm_1">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							</div>	
+						`;
+					} else {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+						`;
+						
+						if(res.data.isPrev) {
+							html += `
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+							`;
+						}
+						for(var i = 0; i < res.data.posts.totalPages; i++) {
+							html += `
+									<a class="my_atag_none_1">
+										<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+											${i+1}
+										</div>
+									</a>
+								`;
+						}
+						
+						if(res.data.isNext) {
+							html += `
+						
+								<a class="my_atag_none my_ml_sm_1" id="main_next">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							`;
+						}
+						
+						html += `
+							</div>	
+							
+						`;
+					}
+					
+					document.getElementById('pagination').innerHTML = html;
+					
+						
+				},
+				error : function(res) {
+					console.log(res);
+
+				}
+			});
+			
+		});
+		
+		/**
+		 *   4-12. 메인 페이지 페이징(이전 페이지)
+		 **/
+		$(document).on('click', '#main_prev', function(e){
+		
+			var main_page = e.currentTarget.innerText - 1;
+			
+			var url = "/api/posts?page=" + main_page; 
+			
+			$.ajax({
+				type : "GET",
+				url : url,
+				contentType : "application/json; charset=UTF-8",
+				success : function(res) {
+					console.log(res);	
+					
+					var html = ``;
+					
+					if(!res.data.posts.content.length) {
+						html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
+					} else {
+						for(var i = 0; i < res.data.posts.content.length; i++) {
+							html += `
+								<div id="my_main_item_${res.data.posts.content[i].id}" class="my_main_item">
+									<a onclick="postInfo(${res.data.posts.content[i].user.id}, ${principalId} ,${res.data.posts.content[i].id})" class="my_atag_none">
+							
+							`;
+							if(res.data.posts.content[i].thumnailImgFileName == null) {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/tistory/images/dog.jpg" width="100%" height="100%">
+									</div>
+								`;
+							} else {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/thumnail/${res.data.posts.content[i].thumnailImgFileName}" width="100%" height="100%">
+									</div>
+								`;
+							}
+								html += `
+										<div class="my_main_content my_p_sm_1">
+											<div class="my_main_item_title">
+												<h3>제목 : ${res.data.posts.content[i].title}</h3>
+											</div>
+											<div class="my_main_item_summary my_mb_sm_1 my_text_two_line">
+												내용 : ${res.data.posts.content[i].content}
+											</div>
+											<div class="my_main_item_date my_mb_sm_1">
+												날짜 : ${res.data.posts.content[i].createdAt}
+											</div>
+										</div>
+									</a>
+									<a href="#" class="my_atag_none">
+										<div class="my_main_item_username">
+											<span>by </span>
+											<b>${res.data.posts.content[i].user.username}</b>
+										</div>
+									</a>
+									
+								</div>
+							`;
+								
+						}
+						
+						html += `
+							
+						`;
+					}
+					
+					document.getElementById('my_main_list').innerHTML = html;
+					
+					html = ``;
+					
+					if(res.data.isFirst) {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+
+								<a class="my_atag_none_1" onclick="">
+									<div class="my_paging_number_box my_mr_sm_1_1">
+										1
+									</div>
+								</a>
+
+								<a class="my_atag_none my_ml_sm_1">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							</div>	
+						`;
+					} else {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+						`;
+						
+						if(res.data.isPrev) {
+							html += `
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+							`;
+						}
+						for(var i = 0; i < res.data.posts.totalPages; i++) {
+							html += `
+									<a class="my_atag_none_1">
+										<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+											${i+1}
+										</div>
+									</a>
+								`;
+						}
+						
+						if(res.data.isNext) {
+							html += `
+						
+								<a class="my_atag_none my_ml_sm_1" id="main_next">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							`;
+						}
+						
+						html += `
+							</div>	
+							
+						`;
+					}
+					
+					document.getElementById('pagination').innerHTML = html;
+					
+						
+				},
+				error : function(res) {
+					console.log(res);
+
+				}
+			});
+		});
+		
+		/**
+		 * 	4-13. 메인 페이지 페이징(다음 페이지) : 2023-11-06 => 메인페이지 페이징 처리 완료
+		 * 
+		 **/
+		$(document).on('click', '#main_next', function(e){
+			
+			var main_page = e.currentTarget.innerText + 1;
+			
+			var url = "/api/posts?page=" + main_page; 
+			
+			$.ajax({
+				type : "GET",
+				url : url,
+				contentType : "application/json; charset=UTF-8",
+				success : function(res) {
+					console.log(res);	
+					
+					var html = ``;
+					
+					if(!res.data.posts.content.length) {
+						html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
+					} else {
+						for(var i = 0; i < res.data.posts.content.length; i++) {
+							html += `
+								<div id="my_main_item_${res.data.posts.content[i].id}" class="my_main_item">
+									<a onclick="postInfo(${res.data.posts.content[i].user.id}, ${principalId} ,${res.data.posts.content[i].id})" class="my_atag_none">
+							
+							`;
+							if(res.data.posts.content[i].thumnailImgFileName == null) {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/tistory/images/dog.jpg" width="100%" height="100%">
+									</div>
+								`;
+							} else {
+								html += `
+									<div class="my_main_item_thumnail">
+										<img src="/thumnail/${res.data.posts.content[i].thumnailImgFileName}" width="100%" height="100%">
+									</div>
+								`;
+							}
+								html += `
+										<div class="my_main_content my_p_sm_1">
+											<div class="my_main_item_title">
+												<h3>제목 : ${res.data.posts.content[i].title}</h3>
+											</div>
+											<div class="my_main_item_summary my_mb_sm_1 my_text_two_line">
+												내용 : ${res.data.posts.content[i].content}
+											</div>
+											<div class="my_main_item_date my_mb_sm_1">
+												날짜 : ${res.data.posts.content[i].createdAt}
+											</div>
+										</div>
+									</a>
+									<a href="#" class="my_atag_none">
+										<div class="my_main_item_username">
+											<span>by </span>
+											<b>${res.data.posts.content[i].user.username}</b>
+										</div>
+									</a>
+									
+								</div>
+							`;
+								
+						}
+						
+						html += `
+							
+						`;
+					}
+					
+					document.getElementById('my_main_list').innerHTML = html;
+					
+					html = ``;
+					
+					if(res.data.isFirst) {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+
+								<a class="my_atag_none_1" onclick="">
+									<div class="my_paging_number_box my_mr_sm_1_1">
+										1
+									</div>
+								</a>
+
+								<a class="my_atag_none my_ml_sm_1">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							</div>	
+						`;
+					} else {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+						`;
+						
+						if(res.data.isPrev) {
+							html += `
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+							`;
+						}
+						for(var i = 0; i < res.data.posts.totalPages; i++) {
+							html += `
+									<a class="my_atag_none_1">
+										<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+											${i+1}
+										</div>
+									</a>
+								`;
+						}
+						
+						if(res.data.isNext) {
+							html += `
+						
+								<a class="my_atag_none my_ml_sm_1" id="main_next">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							`;
+						}
+						
+						html += `
+							</div>	
+							
+						`;
+					}
+					
+					document.getElementById('pagination').innerHTML = html;
+					
+						
+				},
+				error : function(res) {
+					console.log(res);
+
+				}
+			});
+		});
+	}
 	
+	/**
+	 * 4-14. 메인 포스팅 보기(카테고리 API 호출) : ACCESS_TOKEN이 없어도 API를 호출 할수 있어야한다.(카테고리 리스트 불러오는 API로직에서 인증객체 제외시킴)
+	 // 2023-11-07 : 인증로직 제거하고 ACCESS_TOKEN이 없어도 불러올 수 있게 밖으로 뺐음
+	 */
+	$.ajax({
+		type : "GET",
+		url : "/api/categories",
+		contentType : "application/json; charset=UTF-8",
+		async: false,  // 2023-10-27 : 상세 보기에서 카테고리 정보 불러오는것 보다 늦게 실행될 수 있기 때문에 비동기 false를 해주닌까 정상 동작.
+		success : function(res) {
+			console.log(res);	
+			
+			// 2023-10-13 : 여기까지
+			for(var i = 0; i < res.data.categories.length; i++) {
+				
+				$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="/index?categoryId=${res.data.categories[i].categoryId}">${res.data.categories[i].title}</a></li>`);
+			}
+			
+			for(var i = 0; i < res.data.categories.length; i++) {
+				if(res.data.categories[i].categoryId == 1) {
+					$("#categoryList").append(`<option value=${res.data.categories[i].categoryId} selected='selected'>${res.data.categories[i].title}</option>`);
+					
+				} else {
+					$("#categoryList").append(`<option value=${res.data.categories[i].categoryId}>${res.data.categories[i].title}</option>`);
+					
+				}
+			}
+
+		},
+		error : function(res) {
+			console.log(res);
+	
+		}
+	});
+	
+	$("#categoryList").change(function(){
+		categoryId = $(this).val();
+	
+		const categoryList = document.getElementById('categoryList');
+		
+		const length = categoryList.options.length;
+		
+		for(let i=0; i < length; i++) {
+			if(categoryList.options[i].value == categoryId) {
+				console.log(categoryList.options[i].value);
+				// 1-1. selected 옵션 전체 삭제
+				$(`#categoryList option`).attr("selected", false);
+				
+				// 1-2. 클릭한 곳에 selected 옵션 활성화
+				$(`#categoryList option:eq(${i})`).attr("selected", true);
+				
+			}
+		}
+	
+	});
+	
+	/**
+	 * 4-15. 메인 포스팅 보기 : ACCESS_TOKEN이 없어도 API를 호출 할수 있어야한다.(새로 만듬)
+	 */
+	let postView = $("#postView").val();
+	
+	if(postView != null) {
+		let pageOwnerId = $("#pageOwnerId").val();
+		let principalId = $("#principalId").val();
+		let postId = $("#postId").val();
+		
+		console.log("pageOwnerId : " + pageOwnerId + ", principalId : " + principalId + ", postId : " + postId);
+		
+		$.ajax({
+			type : "GET",
+			url : `/api/posts/${pageOwnerId}/${postId}/${principalId}/info`,
+			contentType : "application/json; charset=UTF-8",
+			success : function(res) {
+				console.log(res);	
+				
+				categoryId = res.data.categoryId;
+				
+				const categoryList = document.getElementById('categoryList');
+				
+				const length = categoryList.options.length;
+				
+				for(let i=0; i < length; i++) {
+					if(categoryList.options[i].value == categoryId) {
+//						console.log(categoryList.options[i].value);
+						// 1-1. selected 옵션 전체 삭제
+						$(`#categoryList option`).attr("selected", false);
+						
+						// 1-2. 클릭한 곳에 selected 옵션 활성화
+						$(`#categoryList option:eq(${i})`).attr("selected", true);
+						
+					}
+				}
+	
+				$("#title").val(res.data.title);
+				$(".ql-editor").html(res.data.content);	
+				
+				if(res.data.thumnailImgFileName) {
+					
+					var thumnailImgArea = document.querySelector("#thumnailImgArea")
+					
+					const img_tag = document.createElement("img");
+					
+					img_tag.id = "thumnailImg";
+					img_tag.src = "/thumnail/" + res.data.thumnailImgFileName;
+					img_tag.width = 20;
+					img_tag.height = 20;
+					
+					thumnailImgArea.appendChild(img_tag);
+				}
+		
+			},
+			error : function(res) {
+				console.log(res);
+		
+			}
+		});
+		
 	}
 	
 	if(ACCESS_TOKEN != null) {
@@ -152,60 +760,6 @@ $(document).ready(function(){
 
 		console.log(data.username);
 		
-		$.ajax({
-			type : "GET",
-			url : "/api/categories",
-			contentType : "application/json; charset=UTF-8",
-			headers: {
-				"Authorization" : "Bearer " + ACCESS_TOKEN
-			},
-			async: false,  // 2023-10-27 : 상세 보기에서 카테고리 정보 불러오는것 보다 늦게 실행될 수 있기 때문에 비동기 false를 해주닌까 정상 동작.
-			success : function(res) {
-				console.log(res);	
-				
-				// 2023-10-13 : 여기까지
-				for(var i = 0; i < res.data.categories.length; i++) {
-					
-					$(".drawer-menu").append(`<li><a class="drawer-menu-item" href="/index?categoryId=${res.data.categories[i].categoryId}">${res.data.categories[i].title}</a></li>`);
-				}
-				
-				for(var i = 0; i < res.data.categories.length; i++) {
-					if(res.data.categories[i].categoryId == 1) {
-						$("#categoryList").append(`<option value=${res.data.categories[i].categoryId} selected='selected'>${res.data.categories[i].title}</option>`);
-						
-					} else {
-						$("#categoryList").append(`<option value=${res.data.categories[i].categoryId}>${res.data.categories[i].title}</option>`);
-						
-					}
-				}
-
-			},
-			error : function(res) {
-				console.log(res);
-		
-			}
-		});
-		
-		$("#categoryList").change(function(){
-			categoryId = $(this).val();
-		
-			const categoryList = document.getElementById('categoryList');
-			
-			const length = categoryList.options.length;
-			
-			for(let i=0; i < length; i++) {
-				if(categoryList.options[i].value == categoryId) {
-					console.log(categoryList.options[i].value);
-					// 1-1. selected 옵션 전체 삭제
-					$(`#categoryList option`).attr("selected", false);
-					
-					// 1-2. 클릭한 곳에 selected 옵션 활성화
-					$(`#categoryList option:eq(${i})`).attr("selected", true);
-					
-				}
-			}
-		
-		});
 				
 		/**
 		 *  4-2. 나의 포스팅 정보 불러오기
@@ -1052,7 +1606,42 @@ function detailPost(principalId, postId) {
  * 2023-11-02 : 변수 연결까지 해놓음(filter에 처음 로그인시에 토큰 값에 id값을 안넣어줘서 문제가 생겼었음)
  */
 function postInfo(pageOwnerId, principalId, postId) {
-	console.log("고민 해보자 : " + pageOwnerId + ", " + principalId + ", " + postId);
+	
+	if(principalId == -1) {
+		console.log("로그인 안했네?");
+	} else {
+		console.log("로그인한 회원의 아이디는 " + principalId);
+	}
+	
+	console.log("이 포스팅을 쓴 사람의 아이디는 " + pageOwnerId);
+	console.log("클릭한 포스팅 글의 아이디는 " + postId);
+	
+
+	var form = document.createElement("form");
+	form.setAttribute("action", "/post/view");
+	form.setAttribute("charset", "utf-8");
+	form.setAttribute("method", "post");
+	
+	var pageOwnerId_field = document.createElement("input");
+	pageOwnerId_field.setAttribute("type", "hidden");
+	pageOwnerId_field.setAttribute("name", "pageOwnerId")
+	pageOwnerId_field.setAttribute("value", pageOwnerId);
+	form.appendChild(pageOwnerId_field);
+
+	var principalId_field = document.createElement("input");
+	principalId_field.setAttribute("type", "hidden");
+	principalId_field.setAttribute("name", "principalId")
+	principalId_field.setAttribute("value", principalId);
+	form.appendChild(principalId_field);
+	
+	var postId_field = document.createElement("input");
+	postId_field.setAttribute("type", "hidden");
+	postId_field.setAttribute("name", "postId")
+	postId_field.setAttribute("value", postId);
+	form.appendChild(postId_field);
+	
+	document.body.appendChild(form);
+	form.submit();
 	
 }
 

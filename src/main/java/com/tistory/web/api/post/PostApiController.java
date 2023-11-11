@@ -45,7 +45,7 @@ public class PostApiController {
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> readAllPost(@RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 6) Pageable pageable) {
+	public ResponseEntity<?> readAllPost(@RequestParam(required = false) Long categoryId, @PageableDefault(size = 6) Pageable pageable) {
 	
 		PostListRespDto postListRespDto = postService.readPostList(categoryId, pageable);
 		
@@ -67,7 +67,15 @@ public class PostApiController {
 
 		User loginUser = principalDetails.getUser();
 		
-		PostInfoRespDto postInfoRespDto = postService.readPostInfo(pageOwnerId, postId, loginUser);
+		PostInfoRespDto postInfoRespDto = postService.readPostInfo(pageOwnerId, postId, loginUser.getId());
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 불러오기 성공", postInfoRespDto), HttpStatus.OK);
+	}
+	
+	@GetMapping("/{pageOwnerId}/{postId}/{principalId}/info")
+	public ResponseEntity<?> readbyPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @PathVariable("principalId") Long principalId) {
+
+		PostInfoRespDto postInfoRespDto = postService.readPostInfo(pageOwnerId, postId, principalId);
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 불러오기 성공", postInfoRespDto), HttpStatus.OK);
 	}

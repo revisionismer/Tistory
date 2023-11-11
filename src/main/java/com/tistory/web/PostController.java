@@ -32,4 +32,16 @@ public class PostController {
 		return "post/postForm";
 	}
 	
+	@PostMapping("/view")
+	public String postView(@RequestParam("pageOwnerId") Long pageOwnerId, @RequestParam("principalId") Long principalId, @RequestParam("postId") Long postId, Model model) {
+		
+		System.out.println("pageOwnerId : " + pageOwnerId + ", principalId : " + principalId + ", postId = " + postId);
+		
+		model.addAttribute("pageOwnerId", pageOwnerId);
+		model.addAttribute("principalId", principalId);
+		model.addAttribute("postId", postId);
+		
+		return "post/postView";
+	}
+	
 }

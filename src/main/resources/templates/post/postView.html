@@ -27,15 +27,15 @@
 	<!-- // container -->
 	<div class="container">
 
-    <input id="pageOwnerId" type="hidden" value="${pageOwnerId}"/>
+    <input id="pageOwnerId" type="hidden" th:value="${pageOwnerId}"/>
     <input id="my-loveId" type="hidden" value=""/>
     <input id="content" type="hidden" value=""/>
     <input id="post" type="hidden" value=""/>
-    <input id="principalId" type="hidden" value="" />
+    <input id="principalId" type="hidden" th:value="${principalId}" />
     <input id="postId" type="hidden" th:value="${postId}"/>
     <input id="category_id" type="hidden" value=""/>
 
-    <form id="postForm" method="post" enctype="multipart/form-data" onsubmit="return getQuill()">
+    <form id="postView" method="post" enctype="multipart/form-data" onsubmit="return getQuill()">
 
         <div class="form-group">
         	
@@ -106,8 +106,6 @@
      
     </form>
     <div id="postBtn">
-    	<button th:if="${postId == null && principalId != null}" id="writeBtn" class="my_active_btn" onclick="">쓰기</button>
-   		<button th:if="${postId != null && principalId != null}" id="modifyBtn" class="my_active_btn" onclick="">수정</button>
    		<button id="cancelBtn" class="my_active_btn" onclick="cancelBtn();">취소</button>
    	</div>
     <br />
