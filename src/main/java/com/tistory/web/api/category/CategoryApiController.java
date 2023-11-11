@@ -44,11 +44,9 @@ public class CategoryApiController {
 	
 	// 2023-10-12 : 여기까지 완료
 	@GetMapping("")
-	public ResponseEntity<?> readAllCategory(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+	public ResponseEntity<?> readAllCategory() {
 		
-		User loginUser = principalDetails.getUser();
-		
-		CategoryListRespDto categoryListRespDto = categoryService.findAllCategoryList(loginUser);
+		CategoryListRespDto categoryListRespDto = categoryService.findAllCategoryList();
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, "카테고리 리스트 불러오기 성공", categoryListRespDto), HttpStatus.OK);
 	}

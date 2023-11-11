@@ -183,18 +183,18 @@ public class PostService {
 		return postListRespDto;
 	}
 	
-	// 2023-11-02 
-	public PostInfoRespDto readPostInfo(Long pageOwnerId, Long postId, User loginUser) {
+	// 2023-11-07 : 매개변수를 User loginUser -> Long principalId로 변경, 이유 : 인증 없이도 사용할 수 있어야 하기 때문
+	public PostInfoRespDto readPostInfo(Long pageOwnerId, Long postId, Long principalId) {
 		
 		Optional<Post> postOp = postRepository.findById(postId);
 		
 		if(postOp.isPresent()) {
 			Post findPost = postOp.get();
 			
-			PostInfoRespDto postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == loginUser.getId() ? true : false);
+			PostInfoRespDto postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == principalId ? true : false);
 			
-			System.out.println(pageOwnerId + ", " + loginUser.getId());
-			visitIncrease(pageOwnerId, loginUser.getId());
+			System.out.println(pageOwnerId + ", " + principalId);
+			visitIncrease(pageOwnerId, principalId);
 			
 			return postInfoRespDto;
 			

@@ -38,7 +38,7 @@ public class CategoryService {
 	}
 
 	@Transactional(readOnly = true)
-	public CategoryListRespDto findAllCategoryList(User loginUser) {
+	public CategoryListRespDto findAllCategoryList() {
 		
 		List<Category> categories = categoryRepository.findAll();
 		
