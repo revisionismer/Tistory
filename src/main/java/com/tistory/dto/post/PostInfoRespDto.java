@@ -29,7 +29,12 @@ public class PostInfoRespDto {
 	// 1-2. 페이지 주인 여부
 	private boolean isPageOwner;
 	
-	public PostInfoRespDto(Post post, boolean isPageOwner) {
+	// 좋아요 여부
+	private boolean isLove;
+	
+	private Long totalLoveCnt;
+	
+	public PostInfoRespDto(Post post, boolean isPageOwner, boolean isLove, Long totalLoveCnt) {
 		this.postId = post.getId();
 		this.title = post.getTitle();
 		this.content = post.getContent();
@@ -41,5 +46,7 @@ public class PostInfoRespDto {
 		this.categoryId = post.getCategory().getId();
 		this.category_title = post.getCategory().getTitle();
 		this.isPageOwner = isPageOwner;
+		this.isLove = isLove;
+		this.totalLoveCnt = totalLoveCnt;
 	}
 }
