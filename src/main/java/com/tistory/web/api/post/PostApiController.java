@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tistory.config.auth.PrincipalDetails;
 import com.tistory.domain.user.User;
 import com.tistory.dto.ResponseDto;
+import com.tistory.dto.love.PostLoveRespDto;
 import com.tistory.dto.post.PostInfoRespDto;
 import com.tistory.dto.post.PostListRespDto;
 import com.tistory.dto.post.PostWriteReqDto;
@@ -88,5 +90,24 @@ public class PostApiController {
 		PostWriteRespDto postWriteRespDto = postService.updatePost(pageOwnerId, postId, postWriteReqDto, loginUser);
 		
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 수정 성공", postWriteRespDto), HttpStatus.ACCEPTED);
+	}
+	
+	@PostMapping("/{pageOwnerId}/{postId}/love")
+	public ResponseEntity<?> lovePostByPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+		
+		User loginUser = principalDetails.getUser();
+		
+		PostLoveRespDto postLoveRespDto = postService.lovePost(pageOwnerId, postId, loginUser);
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, loginUser.getId() + "번 사용자가 " + pageOwnerId + "번 유저가 작성한 "  + postId + "번 포스팅 글 좋아요 성공", postLoveRespDto), HttpStatus.CREATED);
+	}
+	
+	@DeleteMapping("/{pageOwnerId}/{postId}/unlove")
+	public ResponseEntity<?> unlovePostByPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+		User loginUser = principalDetails.getUser();
+		
+		postService.unlovePost(pageOwnerId, postId, loginUser);
+		
+		return new ResponseEntity<>(new ResponseDto<>(1, loginUser.getId() + "번 사용자가 " + pageOwnerId + "번 유저가 작성한 "  + postId + "번 포스팅 글 좋아요 삭제 성공", null), HttpStatus.OK);
 	}
 }

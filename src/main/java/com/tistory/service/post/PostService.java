@@ -18,11 +18,15 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.tistory.domain.category.Category;
 import com.tistory.domain.category.CategoryRepository;
+import com.tistory.domain.love.Love;
+import com.tistory.domain.love.LoveRepository;
 import com.tistory.domain.post.Post;
 import com.tistory.domain.post.PostRepository;
 import com.tistory.domain.user.User;
+import com.tistory.domain.user.UserRepository;
 import com.tistory.domain.visit.Visit;
 import com.tistory.domain.visit.VisitRepository;
+import com.tistory.dto.love.PostLoveRespDto;
 import com.tistory.dto.post.PostInfoRespDto;
 import com.tistory.dto.post.PostListRespDto;
 import com.tistory.dto.post.PostWriteReqDto;
@@ -42,6 +46,8 @@ public class PostService {
 	private final PostRepository postRepository;
 	private final CategoryRepository categoryRepository;
 	private final VisitRepository visitRepository;
+	private final UserRepository userRepository;
+	private final LoveRepository loveRepository;
 	
 	public PostWriteRespDto writePost(PostWriteReqDto postWriteReqDto, User loginUser) {
 		String thumnail = null;
@@ -188,18 +194,51 @@ public class PostService {
 		
 		Optional<Post> postOp = postRepository.findById(postId);
 		
+		Optional<Love> loveOp = loveRepository.mFindByUserIdAndPrincipalIdAndPostId(pageOwnerId, principalId, postId);
+		
 		if(postOp.isPresent()) {
 			Post findPost = postOp.get();
 			
-			PostInfoRespDto postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == principalId ? true : false);
+			PostInfoRespDto postInfoRespDto = null;
 			
-			System.out.println(pageOwnerId + ", " + principalId);
+			Long totalLoveCnt = loveRepository.countByPostId(postId);
+			
+			if(loveOp.isPresent()) {
+				postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == principalId ? true : false, true, totalLoveCnt);
+				
+			} else {
+				postInfoRespDto = new PostInfoRespDto(findPost, pageOwnerId == principalId ? true : false, false, totalLoveCnt);
+				
+			}
+		
 			visitIncrease(pageOwnerId, principalId);
 			
 			return postInfoRespDto;
 			
 		} else {
 			throw new CustomApiException(postId + "번 포스팅 정보를 찾을 수 없습니다.");
+		}
+	}
+	
+	public void lovePost(Long pageOwnerId, Long principalId, Long postId) {
+		Optional<Post> postOp = postRepository.findById(postId);
+		
+		if(postOp.isPresent()) {
+			Post findPost = postOp.get();
+			
+			// 2023-11-13 : 어떤 사용자가 포스팅글 보기를 눌렀을때 해당 페이지 주인의 id와 포스팅 글의 id로 좋아요 엔티티 생성
+			Optional<Love> loveOp = loveRepository.mFindByUserIdAndPrincipalIdAndPostId(pageOwnerId, principalId, postId);
+			
+			User pageOwner = userRepository.findUserById(pageOwnerId);
+			
+			if(!loveOp.isPresent()) {
+				Love love = new Love();
+				love.setPost(findPost);
+				love.setUser(pageOwner);
+				love.setCreatedAt(LocalDateTime.now());
+				
+				loveRepository.save(love);
+			}
 		}
 	}
 	
@@ -316,5 +355,74 @@ public class PostService {
         } else {
             throw new CustomApiException("일시적 문제가 생겼습니다. 관리자에게 문의해주세요.");
         }
+	}
+	
+	public PostLoveRespDto lovePost(Long pageOwnerId, Long postId, User loginUser) {
+		Post postEntity = null;
+	
+		User pageOwner = null;
+		
+		Love loveEntity = null;
+		
+		if(!pageOwnerId.equals(loginUser.getId())) {
+			
+			Optional<Post> postOp = postRepository.findById(postId);
+			
+			if(postOp.isPresent()) {
+				postEntity = postOp.get();
+			} else {
+	            throw new CustomApiException("해당 게시글이 존재하지 않습니다");
+	        }
+			
+			Long totalLoveCnt = loveRepository.countByPostId(postId);
+			
+			PostInfoRespDto postInfoRespDto = new PostInfoRespDto(postEntity, pageOwnerId == loginUser.getId() ? true : false, true, totalLoveCnt);
+			
+			Optional<User> userOp = userRepository.findById(pageOwnerId);
+			
+			if(userOp.isPresent()) {
+				pageOwner = userOp.get();
+			} else {
+				throw new CustomApiException("존재하지 않는 사용자 입니다.");
+			}
+			
+			Optional<Love> loveOp = loveRepository.mFindByUserIdAndPrincipalIdAndPostId(pageOwnerId, loginUser.getId(), postId);
+			
+			if(!loveOp.isPresent()) {
+				Love love = new Love();
+				love.setPageOwner(pageOwner);
+				love.setUser(loginUser);
+				love.setPost(postEntity);
+				love.setCreatedAt(LocalDateTime.now());
+				
+				loveEntity = loveRepository.save(love);
+				
+			} else {
+				throw new CustomApiException("이미 좋아요를 한 글입니다.");
+			}
+			
+			PostLoveRespDto postLoveRespDto = new PostLoveRespDto();
+			postLoveRespDto.setLoveId(loveEntity.getId());
+			postLoveRespDto.setPost(postInfoRespDto);
+		
+			return postLoveRespDto;
+			
+		} else {
+			throw new CustomApiException("자기 글에는 좋아요를 할 수 없습니다.");
+		}
+	}
+	
+	// 2023-11-15 : 여기까지
+	public void unlovePost(Long pageOwnerId, Long postId, User loginUser) {
+		Optional<Love> loveOp = loveRepository.mFindByUserIdAndPrincipalIdAndPostId(pageOwnerId, loginUser.getId(), postId);
+		
+		if(loveOp.isPresent()) {
+			Love findLove = loveOp.get();
+			
+			loveRepository.delete(findLove);
+			
+		} else {
+			throw new CustomApiException("좋아요를 하지 않았습니다.");
+		}
 	}
 }

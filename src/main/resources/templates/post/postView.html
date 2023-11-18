@@ -96,17 +96,23 @@
    
         <textarea name="content" id="content" class="my_hidden"></textarea>
 
-        <div class="form-control d-flex justify-content-end">
-       		
+        <div class="form-control d-flex justify-content-between">
+			
+			<div id="loveArea">
+				<i class="fa-solid fa-heart my_fake_like my_mr_sm_1" id="unlove"></i>
+				<i class="far fa-heart my_fake_un_like my_mr_sm_1" id="love"></i>
+				<b id="totalLoveCnt">좋아요 갯수</b>
+           	</div> 
+			     		
             <div id="thumnailImgArea">
             	
             </div>
-    
+                               
         </div>
-     
+
     </form>
     <div id="postBtn">
-   		<button id="cancelBtn" class="my_active_btn" onclick="cancelBtn();">취소</button>
+   		<button id="homeBtn" class="my_active_btn" onclick="homeBtn();">취소</button>
    	</div>
     <br />
 		
@@ -156,8 +162,8 @@
 		]);
     }
 		
-	function cancelBtn() {
-		window.history.back();
+	function homeBtn() {
+		location.href = "/"
 	}
 		
 </script>
