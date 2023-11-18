@@ -699,7 +699,7 @@ $(document).ready(function(){
 				console.log(res);	
 				
 				categoryId = res.data.categoryId;
-				
+			
 				const categoryList = document.getElementById('categoryList');
 				
 				const length = categoryList.options.length;
@@ -732,6 +732,14 @@ $(document).ready(function(){
 					
 					thumnailImgArea.appendChild(img_tag);
 				}
+				
+				if(res.data.love == false) {
+					$("#unlove").hide();
+				} else {
+					$("#love").hide();
+				}
+				
+				document.getElementById('totalLoveCnt').innerHTML = res.data.totalLoveCnt;
 		
 			},
 			error : function(res) {
@@ -1574,6 +1582,137 @@ $(document).ready(function(){
 });
 
 /**
+ * 4-16. 포스팅 좋아요 취소 : 2023-11-16 : 좋아요 상태 변화 비동기로 화면 깜빡임 없이 바뀌게 수정, 포스팅 글을 좋아한 전체 좋아요 수도 바뀌게 수정
+ *  
+ **/
+$(document).on('click', '#unlove', function(e){
+	
+	let pageOwnerId = $("#pageOwnerId").val();
+	let principalId = $("#principalId").val();
+	let postId = $("#postId").val();
+
+	if(principalId == -1) {
+		alert("로그인을 해주세요.");
+		// 2023-11-15 : location.href에서 location.replace로 변경 -> 이전 페이지 히스토리를 완전히 삭제해야되기 때문에 replace로 변경함.
+		location.replace("/login");
+		return;
+	}
+	
+	if(ACCESS_TOKEN != null) {
+		$.ajax({
+			type : "DELETE",
+			url : `/api/posts/${pageOwnerId}/${postId}/unlove`,
+			contentType : "application/json; charset=UTF-8",
+			headers: {
+				"Authorization" : "Bearer " + ACCESS_TOKEN
+			},
+			success : function(res) {
+				console.log(res);	
+				
+				$.ajax({
+					type : "GET",
+					url : `/api/posts/${pageOwnerId}/${postId}/${principalId}/info`,
+					contentType : "application/json; charset=UTF-8",
+					success : function(res) {
+						console.log(res);
+						
+						if(res.data.love == false) {
+							$("#unlove").hide();
+							$("#love").show();
+							
+							document.getElementById('totalLoveCnt').innerHTML = res.data.totalLoveCnt;
+						}
+				
+					},
+					error : function(res) {
+						console.log(res);
+						
+						if(res.responseJSON.data == null) {
+							alert(res.responseJSON.message);
+						}
+				
+					}
+				});
+				
+			},
+			error : function(res) {
+				console.log(res);
+				
+				if(res.responseJSON.data == null) {
+					alert(res.responseJSON.message);
+				} 
+			}
+			
+		});	
+	}
+});
+
+/**
+ * 4-17. 포스팅 좋아요 : 2023-11-14, 2023-11-16 : 좋아요 상태 변화 비동기로 화면 깜빡임 없이 바뀌게 수정, 포스팅 글을 좋아한 전체 좋아요 수도 바뀌게 수정
+ *  
+ **/
+$(document).on('click', '#love', function(e){
+	let pageOwnerId = $("#pageOwnerId").val();
+	let principalId = $("#principalId").val();
+	let postId = $("#postId").val();
+	
+	if(principalId == -1) {
+		alert("로그인을 해주세요.");
+		location.replace("/login");
+		return;
+	}
+
+	if(ACCESS_TOKEN != null) {
+		$.ajax({
+			type : "POST",
+			url : `/api/posts/${pageOwnerId}/${postId}/love`,
+			contentType : "application/json; charset=UTF-8",
+			headers: {
+				"Authorization" : "Bearer " + ACCESS_TOKEN
+			},
+			success : function(res) {
+				console.log(res);	
+				
+				$.ajax({
+					type : "GET",
+					url : `/api/posts/${pageOwnerId}/${postId}/${principalId}/info`,
+					contentType : "application/json; charset=UTF-8",
+					success : function(res) {
+						console.log(res);
+						
+						if(res.data.love == true) {
+							$("#love").hide();
+							$("#unlove").show();
+							
+							document.getElementById('totalLoveCnt').innerHTML = res.data.totalLoveCnt;
+						}
+				
+					},
+					error : function(res) {
+						console.log(res);
+				
+						if(res.responseJSON.data == null) {
+							alert(res.responseJSON.message);
+						}
+					}
+				});
+				
+			},
+			error : function(res) {
+				console.log(res);
+				
+				if(res.responseJSON.data == null) {
+					alert(res.responseJSON.message);
+				} 
+			}
+			
+		});	
+	}
+	
+});
+
+
+/**
  * 4-8. 상세보기 화면으로 값들고 가기. 
  **/
 function detailPost(principalId, postId) {
@@ -1649,3 +1788,4 @@ function postInfo(pageOwnerId, principalId, postId) {
 function deleteCookie(key) {
 	document.cookie = key + '=; expires=Thu, 01 Jan 1999 00:00:10 GMT;path=/;';
 }
+
