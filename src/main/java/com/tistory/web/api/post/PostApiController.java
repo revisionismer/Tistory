@@ -36,7 +36,7 @@ public class PostApiController {
 	
 	private final PostService postService;
 	
-	@PostMapping("/write")
+	@PostMapping("/s/write")
 	public ResponseEntity<?> writePost(@AuthenticationPrincipal PrincipalDetails principalDetails, @Valid final PostWriteReqDto postWriteReqDto, BindingResult bindingResult) {
 		
 		User loginUser = principalDetails.getUser();
@@ -54,7 +54,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
 	}
 	
-	@GetMapping("/{pageOwnerId}")
+	@GetMapping("/s/{pageOwnerId}")
 	public ResponseEntity<?> readAllPostByPageOwnerId(@PathVariable("pageOwnerId") Long pageOwnerId, @RequestParam(required = false) Long categoryId, @AuthenticationPrincipal PrincipalDetails principalDetails, @PageableDefault(size = 6) Pageable pageable) {
 
 		User loginUser = principalDetails.getUser();
@@ -64,7 +64,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
 	}
 	
-	@GetMapping("/{pageOwnerId}/{postId}/info")
+	@GetMapping("/s/{pageOwnerId}/{postId}/info")
 	public ResponseEntity<?> readbyPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
 		User loginUser = principalDetails.getUser();
@@ -74,7 +74,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 불러오기 성공", postInfoRespDto), HttpStatus.OK);
 	}
 	
-	@GetMapping("/{pageOwnerId}/{postId}/{principalId}/info")
+	@GetMapping("/s/{pageOwnerId}/{postId}/{principalId}/info")
 	public ResponseEntity<?> readbyPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @PathVariable("principalId") Long principalId) {
 
 		PostInfoRespDto postInfoRespDto = postService.readPostInfo(pageOwnerId, postId, principalId);
@@ -82,7 +82,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 불러오기 성공", postInfoRespDto), HttpStatus.OK);
 	}
 	
-	@PutMapping("/{pageOwnerId}/{postId}/update")
+	@PutMapping("/s/{pageOwnerId}/{postId}/update")
 	public ResponseEntity<?> updatePostByPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails, @Valid final PostWriteReqDto postWriteReqDto, BindingResult bindingResult) {
 		
 		User loginUser = principalDetails.getUser();
@@ -92,7 +92,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 수정 성공", postWriteRespDto), HttpStatus.ACCEPTED);
 	}
 	
-	@PostMapping("/{pageOwnerId}/{postId}/love")
+	@PostMapping("/s/{pageOwnerId}/{postId}/love")
 	public ResponseEntity<?> lovePostByPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 		
 		User loginUser = principalDetails.getUser();
@@ -102,7 +102,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, loginUser.getId() + "번 사용자가 " + pageOwnerId + "번 유저가 작성한 "  + postId + "번 포스팅 글 좋아요 성공", postLoveRespDto), HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/{pageOwnerId}/{postId}/unlove")
+	@DeleteMapping("/s/{pageOwnerId}/{postId}/unlove")
 	public ResponseEntity<?> unlovePostByPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 		User loginUser = principalDetails.getUser();
 		
