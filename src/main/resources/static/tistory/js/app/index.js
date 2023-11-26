@@ -34,7 +34,7 @@ if(ACCESS_TOKEN != null) {
 	
 	dropdown_menu.append(`<a class="dropdown-item menu1" href="/post/list">내 블로그</a>`);
 	dropdown_menu.append(`<a class="dropdown-item menu2" href="/user/myInfo">계정관리</a>`);
-	dropdown_menu.append(`<a class="dropdown-item menu3" href="/user/boards">게시판</a>`);
+	dropdown_menu.append(`<a class="dropdown-item menu3" href="/user/board/list">게시판</a>`);
 	
 	if(data.role === 'ADMIN') { 
 		dropdown_menu.append(`<a class="dropdown-item menu4" href="/category/write">카테고리관리</a>`);
