@@ -735,10 +735,11 @@ $(document).ready(function(){
 				
 				if(res.data.love == false) {
 					$("#unlove").hide();
+					
 				} else {
 					$("#love").hide();
+					
 				}
-				
 				document.getElementById('totalLoveCnt').innerHTML = res.data.totalLoveCnt;
 		
 			},
@@ -767,8 +768,7 @@ $(document).ready(function(){
 		var data = JSON.parse(Base64.decode(payload));
 
 		console.log(data.username);
-		
-				
+						
 		/**
 		 *  4-2. 나의 포스팅 정보 불러오기
 		 **/
@@ -781,7 +781,7 @@ $(document).ready(function(){
 
 			$.ajax({
 				type : "GET",
-				url : `/api/posts/${principalId}`,
+				url : `/api/posts/s/${principalId}`,
 				contentType : "application/json; charset=UTF-8",
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
@@ -920,7 +920,7 @@ $(document).ready(function(){
 			var page = e.currentTarget.innerText - 1;
 			var principalId = data.id;
 			
-			var url = "/api/posts/" + principalId + "?page=" + page; 
+			var url = "/api/posts/s/" + principalId + "?page=" + page; 
 			
 			$.ajax({
 				type : "GET",
@@ -1065,7 +1065,7 @@ $(document).ready(function(){
 			var page = e.currentTarget.innerText - 1;
 			var principalId = data.id;
 			
-			var url = "/api/posts/" + principalId + "?page=" + page; 
+			var url = "/api/posts/s/" + principalId + "?page=" + page; 
 			
 			$.ajax({
 				type : "GET",
@@ -1212,7 +1212,7 @@ $(document).ready(function(){
 			
 			var principalId = data.id;
 			
-			var url = "/api/posts/" + principalId + "?page=" + page; 
+			var url = "/api/posts/s/" + principalId + "?page=" + page; 
 			
 			$.ajax({
 				type : "GET",
@@ -1384,7 +1384,7 @@ $(document).ready(function(){
 		if(ACCESS_TOKEN != null) {
 			$.ajax({
 				type : "POST",
-				url : `/api/posts/write`,
+				url : `/api/posts/write/s`,
 				data: formData,
 				contentType: false,
 				processData: false,
@@ -1440,7 +1440,7 @@ $(document).ready(function(){
 			
 			$.ajax({
 				type : "GET",
-				url : `/api/posts/${pageOwnerId}/${postId}/info`,
+				url : `/api/posts/s/${pageOwnerId}/${postId}/info`,
 				contentType : "application/json; charset=UTF-8",
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN
@@ -1537,7 +1537,7 @@ $(document).ready(function(){
 		if(ACCESS_TOKEN != null) {
 			$.ajax({
 				type : "PUT",
-				url : "/api/posts/" + pageOwnerId + "/" + postId + "/update",  // 2023-10-26 : `` 안에 쓰면 string Long convert 오류가 떠서 이렇게 바꿈
+				url : "/api/posts/s/" + pageOwnerId + "/" + postId + "/update",  // 2023-10-26 : `` 안에 쓰면 string Long convert 오류가 떠서 이렇게 바꿈
 				data: formData,
 				contentType: false,
 				processData: false,
@@ -1601,7 +1601,7 @@ $(document).on('click', '#unlove', function(e){
 	if(ACCESS_TOKEN != null) {
 		$.ajax({
 			type : "DELETE",
-			url : `/api/posts/${pageOwnerId}/${postId}/unlove`,
+			url : `/api/posts/s/${pageOwnerId}/${postId}/unlove`,
 			contentType : "application/json; charset=UTF-8",
 			headers: {
 				"Authorization" : "Bearer " + ACCESS_TOKEN
@@ -1665,7 +1665,7 @@ $(document).on('click', '#love', function(e){
 	if(ACCESS_TOKEN != null) {
 		$.ajax({
 			type : "POST",
-			url : `/api/posts/${pageOwnerId}/${postId}/love`,
+			url : `/api/posts/s/${pageOwnerId}/${postId}/love`,
 			contentType : "application/json; charset=UTF-8",
 			headers: {
 				"Authorization" : "Bearer " + ACCESS_TOKEN
