@@ -10,7 +10,6 @@
 		}
 		.my_atag_none_1 {
 			outline: 1px solid rgb(185, 185, 185);
-    		padding: 0 5px;
 		}
 		#adv-search {
 			justify-content: center;
@@ -27,11 +26,7 @@
 		#content #boardArea {
 			width: 800px
 		}
-		
-		#boardWriteBtnArea {
-			margin-right: 100px;
-		}
-		
+
 	</style>
 </head>
 <body class="drawer drawer--left">
@@ -66,7 +61,7 @@
     	<div id="content">
 		
 			<!-- /* 게시글 영역 */ -->
-			<div id="boardArea" class="table-responsive clearfix">
+			<div id="boardArea" class="table-responsive clearfix text-center">
 				<table class="table table-hover">
 					<thead>
 						<tr>
@@ -82,14 +77,17 @@
 					<tbody id="list">
 					</tbody>
 				</table>
-								
+				<p id="not_board_data_area"></p>
+				
+				<!-- /* 페이지네이션 rending 영역 */ -->
+				<nav class="text-center" aria-label="Page Navigation">
+					<div id="pagination">
+				
+					</div>
+				</nav>
+				
 			</div>
-			<!-- /* 페이지네이션 rending 영역 */ -->
-			<nav class="text-center" aria-label="Page Navigation">
-				<ul class="pagination">
-								
-				</ul>
-			</nav>
+			
 		</div>
 		
 	</div>

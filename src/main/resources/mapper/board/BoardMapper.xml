@@ -10,6 +10,7 @@
 		<result property="content" column="content"/>
 		<result property="writer" column="writer"/>
 		<result property="hits" column="hits"/>
+		<result property="oriFileName" column="oriFileName"/>
 		<result property="deleteYn" column="deleteYn"/>
 		<result property="createdAt" column="createdAt"/>
 		<result property="updatedAt" column="updatedAt"/>
@@ -78,5 +79,5 @@
 			#{pagination.limitStart}, #{recordPerPage}
 			
 	</select>
-
+	
 </mapper>

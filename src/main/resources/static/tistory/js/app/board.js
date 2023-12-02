@@ -32,11 +32,119 @@ $(document).ready(function(){
 		console.log(data.id);
 		
 		/**
-		 *	5-1. 게시글 리스트
+		 *	5-1. 게시글 리스트 : 2023-12-01 -> 페이징 작업중.
 		 **/
 		let boardList = $("#list").val();
 		
 		if(boardList != null) {
+			var page = 1;
+			var recordPerPage = 10;
+			var pageSize = 10;
+			
+			var url = "/api/boards?page=" + page + "&recordPerPage=" + recordPerPage + "&pageSize=" + pageSize;
+			
+			$.ajax({
+				type : "GET",
+				url : url,
+				contentType : "application/json; charset=UTF-8",
+				headers: {
+					"Authorization" : "Bearer " + ACCESS_TOKEN
+				},
+				success : function(res) {
+					console.log(res);	
+					
+					var html = ``;
+					
+					if(!res.data.result.list.length) {
+						html = `<p id="not_board_data_msg">등록된 게시글이 없습니다.</p>`;
+						
+						document.getElementById('not_board_data_area').innerHTML = html;
+						
+						return;
+					} else {
+						for(var i = 0; i < res.data.result.list.length; i++) {
+							html += `
+								<tr>
+									<td>${res.data.result.list[i].id}</td>
+									<td>${res.data.result.list[i].title}</td>
+									<td>${res.data.result.list[i].writer}</td>
+									<td>${res.data.result.list[i].createdAt}</td>
+									<td>${res.data.result.list[i].hits}</td>
+								</tr>
+							`;
+						}
+						
+					}
+					
+					document.getElementById('list').innerHTML = html;
+					
+					html = ``;
+					
+					if(res.data.result.list.length == 0) {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+
+								<a class="my_atag_none_1">
+									<div class="my_paging_number_box my_mr_sm_1_1">
+										1
+									</div>
+								</a>
+
+								<a class="my_atag_none my_ml_sm_1">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							</div>	
+						`;
+					} else {
+						html += `
+							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+						`;
+						
+						if(res.data.result.params.pagination.existPrevPage) {
+							html += `
+								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+									<i class="fa-solid fa-angle-left"></i>
+								</a>
+							`;
+						}
+						for(var i = 0; i < res.data.result.params.pagination.totalPageCount; i++) {
+							html += `
+									<a class="my_atag_none_1">
+										<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+											${i+1}
+										</div>
+									</a>
+								`;
+						}
+						
+						if(res.data.result.params.pagination.existNextPage) {
+							html += `
+						
+								<a class="my_atag_none my_ml_sm_1" id="main_next">
+									<i class="fa-solid fa-angle-right"></i>
+								</a>
+							`;
+						}
+						
+						html += `
+							</div>	
+							
+						`;
+					}
+					
+					document.getElementById('pagination').innerHTML = html;
+
+						
+				},
+				error : function(res) {
+					console.log(res);
+
+				}
+			});
+			
 			
 		}
 		
@@ -49,7 +157,7 @@ $(document).ready(function(){
 			$("#writer").val(data.username);
 			
 			let boardId = $("#boardId").val();
-	
+			
 			if(boardId.length !== 0) {
 				$("#boardWriteBtn").hide();
 			} else {
@@ -57,6 +165,73 @@ $(document).ready(function(){
 				$("#boardModifyBtn").hide();
 			}
 			
+			$("#boardWriteBtn").on("click", function(){
+					
+				let title = $("#title").val();
+				let writer = data.username;
+				let content = document.getElementById('boardContent').value;
+				
+				if(title.length === 0){
+					alert("제목을 입력해주세요.");
+					$("#title").focus();
+					return;
+				} 
+				
+				if(content.length === 0) {
+					alert("내용을 입력해주세요.")
+					$("#boardContent").focus();
+					return;
+				}
+				
+				var boardObject = {
+					title : $("#title").val(),
+					writer : $("#writer").val(),
+					content : document.getElementById('boardContent').value
+				}
+				
+				var fileList = $("#file_items")[0].files;
+						
+				var formData = new FormData();
+				formData.append("board", JSON.stringify(boardObject));
+						
+				for(var i = 0; i < fileList.length; i++) {
+					formData.append("files", fileList[i]);
+				}
+						
+				console.log(formData.get('board'));
+				console.log(formData.get('files'));
+					
+				$.ajax({
+					type : "POST",
+					url : "/api/boards/s",
+					data: formData,
+					headers: {
+						"Authorization" : "Bearer " + ACCESS_TOKEN
+					},
+					cache: false,
+					processData: false,
+					contentType: false,
+					success : function(res) {
+						console.log(res);
+						
+						if(res.code === 1) {
+							alert("글쓰기 성공");
+							location.href = "/user/board/list"
+						}
+						
+					},
+					error : function(res) {
+						console.log(res);
+						alert("파일 업로드 허용 용량을 초과했습니다. 500MB미만으로 올려주세요");
+						$("#file_items").val("");
+						return;
+											
+					}
+				});
+					
+			});
+			
+			// 2023-11-29 : 파일업로드는 잘되는데 예외처리 해줘야함 : 파일 업로드하는쪽에서 캐치해야함.
 		}
 		
 	}
