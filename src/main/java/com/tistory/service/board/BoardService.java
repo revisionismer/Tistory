@@ -76,9 +76,6 @@ public class BoardService {
 			board.setDeleteYn('N');
 			board.setCreatedAt(LocalDateTime.now());
 			
-			// 게시판 정보 저장.
-			Board newBoard = boardRepository.save(board);
-						
 			BoardFile boardFile = null;
 		
 			if(files != null) {			
@@ -94,7 +91,7 @@ public class BoardService {
 						boardFile.setFileName(file.getOriginalFilename());
 						boardFile.setFileUrl(createdFilename);
 						boardFile.setDownCnt(0);
-						boardFile.setBoardId(newBoard.getId());
+						boardFile.setBoardId(board.getId());
 						boardFile.setUserId(loginUser.getId());
 						boardFile.setCreatedAt(LocalDateTime.now());
 
@@ -109,6 +106,9 @@ public class BoardService {
 				}
 			}
 			
+			// 게시판 정보 저장. -> 파일 관련 예외가 터지면 롤백되고 여기는 실행 안되야 되기 때문에 뒤로 코드 변경
+			Board newBoard = boardRepository.save(board);
+									
 			if(boardFile == null) {
 				return new BoardRespDto(newBoard);
 			} else {
