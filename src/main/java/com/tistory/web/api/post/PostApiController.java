@@ -64,7 +64,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, "포스트 리스트 불러오기 성공", postListRespDto), HttpStatus.OK);
 	}
 	
-	@GetMapping("/s/{pageOwnerId}/{postId}/info")
+	@GetMapping("/{pageOwnerId}/{postId}/info")
 	public ResponseEntity<?> readbyPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
 
 		User loginUser = principalDetails.getUser();
@@ -74,7 +74,7 @@ public class PostApiController {
 		return new ResponseEntity<>(new ResponseDto<>(1, postId + "번 포스팅 정보 불러오기 성공", postInfoRespDto), HttpStatus.OK);
 	}
 	
-	@GetMapping("/s/{pageOwnerId}/{postId}/{principalId}/info")
+	@GetMapping("/{pageOwnerId}/{postId}/{principalId}/info")
 	public ResponseEntity<?> readbyPostId(@PathVariable("pageOwnerId") Long pageOwnerId, @PathVariable("postId") Long postId, @PathVariable("principalId") Long principalId) {
 
 		PostInfoRespDto postInfoRespDto = postService.readPostInfo(pageOwnerId, postId, principalId);

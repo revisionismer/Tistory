@@ -78,6 +78,11 @@ $(document).ready(function(){
 				
 				if(!res.data.posts.content.length) {
 					html = '<p id="not_post_data_msg" colspan="53">등록된 포스팅이 없습니다.</p>';
+					
+					document.getElementById('main').innerHTML = html;
+					
+					return;
+					
 				} else {
 					for(var i = 0; i < res.data.posts.content.length; i++) {
 						html += `
@@ -1384,7 +1389,7 @@ $(document).ready(function(){
 		if(ACCESS_TOKEN != null) {
 			$.ajax({
 				type : "POST",
-				url : `/api/posts/write/s`,
+				url : `/api/posts/s/write`,
 				data: formData,
 				contentType: false,
 				processData: false,
@@ -1440,7 +1445,7 @@ $(document).ready(function(){
 			
 			$.ajax({
 				type : "GET",
-				url : `/api/posts/s/${pageOwnerId}/${postId}/info`,
+				url : `/api/posts/${pageOwnerId}/${postId}/info`,
 				contentType : "application/json; charset=UTF-8",
 				headers: {
 					"Authorization" : "Bearer " + ACCESS_TOKEN

@@ -6,12 +6,15 @@ import javax.validation.constraints.NotNull;
 import com.tistory.domain.board.Board;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@ToString
+@Getter @Setter
 public class BoardReqDto {
 	
 	@NotBlank
@@ -19,7 +22,7 @@ public class BoardReqDto {
 	
 	@NotNull
 	private String content; // 2. 내용
-	
+
 	private char deleteYn; // 3. 삭제여부
 	
 	public Board toEntity() {
