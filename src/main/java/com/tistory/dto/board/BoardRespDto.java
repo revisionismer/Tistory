@@ -2,7 +2,9 @@ package com.tistory.dto.board;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.tistory.domain.board.Board;
+import com.tistory.domain.board.BoardFile;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,8 +26,12 @@ public class BoardRespDto {
 	
 	private char deleteYn; // 6. 삭제여부
 	
+	private String oriFileName;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime createdAt;
 	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime updatedAt;
 	
 	public BoardRespDto(Board entity) {
@@ -35,6 +41,18 @@ public class BoardRespDto {
 		this.writer = entity.getWriter();
 		this.hits = entity.getHits();
 		this.deleteYn = entity.getDeleteYn();
+		this.createdAt = entity.getCreatedAt();
+		this.updatedAt = entity.getUpdatedAt();
+	}
+	
+	public BoardRespDto(Board entity, BoardFile boardFile) {
+		this.id = entity.getId();
+		this.title = entity.getTitle();
+		this.content = entity.getContent();
+		this.writer = entity.getWriter();
+		this.hits = entity.getHits();
+		this.deleteYn = entity.getDeleteYn();
+		this.oriFileName = boardFile.getFileName();
 		this.createdAt = entity.getCreatedAt();
 		this.updatedAt = entity.getUpdatedAt();
 	}
