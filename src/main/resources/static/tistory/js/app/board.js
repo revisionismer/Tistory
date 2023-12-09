@@ -36,6 +36,8 @@ $(document).ready(function(){
 		 **/
 		let boardList = $("#list").val();
 		
+		var principalId = data.id;
+		
 		if(boardList != null) {
 			var page = 1;
 			var recordPerPage = 10;
@@ -64,7 +66,7 @@ $(document).ready(function(){
 					} else {
 						for(var i = 0; i < res.data.result.list.length; i++) {
 							html += `
-								<tr>
+								<tr onclick="detailBoard(${principalId}, ${res.data.result.list[i].id});">
 									<td>${res.data.result.list[i].id}</td>
 									<td>${res.data.result.list[i].title}</td>
 									<td>${res.data.result.list[i].writer}</td>
@@ -162,7 +164,7 @@ $(document).ready(function(){
 				$("#boardWriteBtn").hide();
 			} else {
 			
-				$("#boardModifyBtn").hide();
+				$("#boardUpdateBtn").hide();
 			}
 			
 			$("#boardWriteBtn").on("click", function(){
@@ -234,17 +236,70 @@ $(document).ready(function(){
 			// 2023-11-29 : 파일업로드는 잘되는데 예외처리 해줘야함 : 파일 업로드하는쪽에서 캐치해야함.
 		}
 		
+		/**
+		 *	5-4. 게시글 상세 내용 보기
+		 **/
+		let boardUpdateForm = $("#boardUpdateForm").val();
+		
+		if(boardUpdateForm != null) {
+	
+			var boardId = $("#boardId").val();
+		
+			console.log(boardId);
+			
+			if(boardId.length !== 0) {
+				$("#boardWriteBtn").hide();
+			} else {
+				$("#boardUpdateBtn").hide();
+			}
+			
+			$.ajax({
+				type : "GET",
+				url : "/api/boards/" + boardId + "/s",
+				headers: {
+					"Authorization" : "Bearer " + ACCESS_TOKEN
+				},
+				success : function(res) {
+					console.log(res);
+					
+					$("#writer").val(res.data[0].writer);
+					$('#title').val(res.data[0].title);
+					$('#boardContent').text(res.data[0].content);
+					
+					if(res.data[0].oriFileName != null) {
+						$("#file_items").hide();
+						
+						var file_area = document.querySelector("#file_list");
+						
+						for(var i = 0; i < res.data.length; i++) {
+							var div_area = document.createElement('div');
+							div_area.setAttribute('id', 'boardFile_' + i);
+							
+							file_area.appendChild(div_area);
+							div_area.innerHTML = `<a href="/api/boards/${boardId}/${res.data[i].boardFileId}/download">${res.data[i].oriFileName}</a>`;
+						}
+						
+					}
+					
+				},
+				error : function(res) {
+					console.log(res);
+					
+					return;
+										
+				}
+			});
+		}
 	}
 	
 });
 
 /**
- * 4-8. 상세보기 화면으로 값들고 가기. 
+ *  5-3. 상세보기 화면으로 값들고 가기. 
  **/
-function writeBoard(principalId) {
-	
+function detailBoard(principalId, boardId) {
 	var form = document.createElement("form");
-	form.setAttribute("action", "/post/detail");
+	form.setAttribute("action", "/user/board/detail");
 	form.setAttribute("charset", "utf-8");
 	form.setAttribute("method", "post");
 	
@@ -254,9 +309,15 @@ function writeBoard(principalId) {
 	principalId_field.setAttribute("value", principalId);
 	form.appendChild(principalId_field);
 	
+	var boardId_field = document.createElement("input");
+	boardId_field.setAttribute("type", "hidden");
+	boardId_field.setAttribute("name", "boardId")
+	boardId_field.setAttribute("value", boardId);
+	form.appendChild(boardId_field);
+	
 	document.body.appendChild(form);
+	
 	form.submit();
-
 }
 
 

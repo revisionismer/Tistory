@@ -26,7 +26,13 @@ public class BoardRespDto {
 	
 	private char deleteYn; // 6. 삭제여부
 	
+	private Long boardFileId;
+	
 	private String oriFileName;
+	
+	private String fileUrl;
+	
+	private Long userId;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm")
 	private LocalDateTime createdAt;
@@ -41,6 +47,7 @@ public class BoardRespDto {
 		this.writer = entity.getWriter();
 		this.hits = entity.getHits();
 		this.deleteYn = entity.getDeleteYn();
+		this.userId = entity.getUser().getId();
 		this.createdAt = entity.getCreatedAt();
 		this.updatedAt = entity.getUpdatedAt();
 	}
@@ -52,7 +59,10 @@ public class BoardRespDto {
 		this.writer = entity.getWriter();
 		this.hits = entity.getHits();
 		this.deleteYn = entity.getDeleteYn();
+		this.boardFileId = boardFile.getFileId();
 		this.oriFileName = boardFile.getFileName();
+		this.fileUrl = boardFile.getFileUrl();
+		this.userId = entity.getUser().getId();
 		this.createdAt = entity.getCreatedAt();
 		this.updatedAt = entity.getUpdatedAt();
 	}

@@ -30,7 +30,7 @@ import com.tistory.handler.exception.CustomApiException;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)  // RuntimeException 말고도 모든 예외가 터졌을시 롤백시킨다.
 @RequiredArgsConstructor
 public class UserService {
 

@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.tistory.dto.ResponseDto;
 import com.tistory.handler.exception.CustomApiException;
+import com.tistory.handler.exception.CustomException;
 import com.tistory.handler.exception.CustomValidationException;
+import com.tistory.util.Script;
 
 @RestControllerAdvice // 1-1. @ControllerAdvice + @RestController : 모든 exception을 낚아챈다.
 public class CustomExceptionHandler {
@@ -45,4 +47,10 @@ public class CustomExceptionHandler {
 		log.error(e.getMessage());
 		return new ResponseEntity<>(new ResponseDto<>(-1, maxFileSize + "크기를 초과한 파일입니다.", null), HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(CustomException.class)
+ 	public String CustomException(CustomException e) {
+ 		return Script.back(e.getMessage());
+ 	}
+	
 }
