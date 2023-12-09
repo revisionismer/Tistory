@@ -8,6 +8,8 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -15,6 +17,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tistory.domain.user.User;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +44,10 @@ public class Board {
 	private int hits;  // 5-5. 조회수
 	
 	private char deleteYn; // 5-6. 삭제여부
+	
+	@JoinColumn(name = "userId")
+	@ManyToOne
+	private User user;
 	
 	@CreatedDate
  	@Column(nullable = false)

@@ -3,7 +3,7 @@
 <head th:replace="fragments/header :: header"></head>
 <head>
 	<style>
-		.boardWriteForm {
+		.boardUpdateForm {
     		display: flex;
     		justify-content: center;
     		align-items: center;
@@ -12,7 +12,7 @@
     	
     		padding-bottom: 50px;
     	}
-    	.boardWriteForm .form-group {
+    	.boardUpdateForm .form-group {
     		width: 100%;
     		padding-left: 150px;
    	 	}
@@ -33,11 +33,11 @@
 		<input id="pageOwnerId" type="hidden" value=""/>
     	<input id="my-loveId" type="hidden" value=""/>
     	<input id="content" type="hidden" value=""/>
-    	<input id="boardId" type="hidden" value=""/>
+    	<input id="boardId" type="hidden" th:value="${boardId}"/>
     	<input id="principalId" type="hidden" th:value="${principalId}" />
    	 	<input id="categoryId" type="hidden" value=""/>
 	
-		<form id="boardWriteForm" class="boardWriteForm" enctype="multipart/form-data">
+		<form id="boardUpdateForm" class="boardUpdateForm" enctype="multipart/form-data">
 			<div class="form-group">
 				<label for="title" class="col-sm-2 control-label">제목</label>
 				<div class="col-sm-10">

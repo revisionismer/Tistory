@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)  // 8-8. RuntimeException 말고도 모든 예외가 터졌을시 롤백시킨다.
 @RequiredArgsConstructor
 public class BoardService {
 
@@ -73,8 +73,11 @@ public class BoardService {
 			log.info("boardString:" + boardString);
 							
 			Board board = new ObjectMapper().readValue(boardString, Board.class);
+			board.setUser(loginUser);
 			board.setDeleteYn('N');
 			board.setCreatedAt(LocalDateTime.now());
+			
+			Board newBoard = boardRepository.save(board);
 			
 			BoardFile boardFile = null;
 		
@@ -91,7 +94,7 @@ public class BoardService {
 						boardFile.setFileName(file.getOriginalFilename());
 						boardFile.setFileUrl(createdFilename);
 						boardFile.setDownCnt(0);
-						boardFile.setBoardId(board.getId());
+						boardFile.setBoardId(newBoard.getId());
 						boardFile.setUserId(loginUser.getId());
 						boardFile.setCreatedAt(LocalDateTime.now());
 
@@ -105,10 +108,7 @@ public class BoardService {
 		
 				}
 			}
-			
-			// 게시판 정보 저장. -> 파일 관련 예외가 터지면 롤백되고 여기는 실행 안되야 되기 때문에 뒤로 코드 변경
-			Board newBoard = boardRepository.save(board);
-									
+				
 			if(boardFile == null) {
 				return new BoardRespDto(newBoard);
 			} else {
@@ -125,6 +125,7 @@ public class BoardService {
 	/**
 	 *  8-2. 게시글 조회
 	 */
+	@Transactional(readOnly = true)
 	public List<BoardRespDto> findAll() {
 		Sort sort = Sort.by(Direction.DESC, "id", "createdAt");
 		List<Board> list = boardRepository.findAll(sort);
@@ -171,7 +172,7 @@ public class BoardService {
 	/**
 	 *  8-4. 게시글 상세정보 조회 
 	 */
-	@Transactional  // 5-2. 영속성 컨텍스트에서 관리되려면 트랜잭션으로 묶여있어야 변경감지가 동작한다.
+	@Transactional(readOnly = true)  // 5-2. 영속성 컨텍스트에서 관리되려면 트랜잭션으로 묶여있어야 변경감지가 동작한다.
 	public BoardRespDto findById(final Long id) {
 		
 		Board boardEntity = null;
@@ -194,7 +195,7 @@ public class BoardService {
 	/**
 	 * 8-5. 게시글 상세정보 조회(글 수정 폼에서 조회 - 조회수 증가 X)  
 	 */
-	@Transactional  // 5-4. 글 수정때 조회할땐 조회수 증가 X
+	@Transactional(readOnly = true)  // 5-4. 글 수정때 조회할땐 조회수 증가 X
 	public BoardRespDto findById(final Long id, User principal) {
 		
 		Board boardEntity = null;
@@ -214,6 +215,7 @@ public class BoardService {
 	/**
 	 * 8-6. 게시글 리스트 조회 - (페이징 처리) : 호출 시 -> http://localhost:8080/api/boards?page=1&recordPerPage=10&pageSize=10 이런식으로 요청해야함
 	 */
+	@Transactional(readOnly = true)
 	public BoardPagingRespDto findAllByPaging(final CommonParams params) {
 		Map<String, Object> result = new HashMap<>();
 		
@@ -247,10 +249,10 @@ public class BoardService {
 	}
 	
 	/**
-	 * 8-7. 게시글 상세정보 조회(파일 이름도 같이 조회)  
+	 * 8-7. 게시글 상세정보 조회(파일 이름도 같이 조회) : 2023-12-06 : 조회수 처리 완료
 	 */
 	@Transactional  // 5-4. 글 수정때 조회할땐 조회수 증가 X
-	public List<BoardRespDto> findByBoardId(final Long boardId, User principal) {
+	public List<BoardRespDto> findByBoardId(final Long boardId, User loginUser) {
 		
 		Board boardEntity = null;
 		
@@ -264,8 +266,18 @@ public class BoardService {
 			
 			List<BoardRespDto> list = new ArrayList<>();
 			
-			for(int i = 0; i < file_list.size(); i++) {
-				list.add(new BoardRespDto(boardEntity, file_list.get(i)));
+			// 2023-12-06 : 파일이 없을때와 있을때 분기 처리
+			if(!file_list.isEmpty()) {
+				for(int i = 0; i < file_list.size(); i++) {
+					list.add(new BoardRespDto(boardEntity, file_list.get(i)));
+				}
+			} else {
+				list.add(new BoardRespDto(boardEntity));
+			}
+			
+			// 자기 자신은 조화수 증가 안하도록 처리해야됨
+			if(!loginUser.getId().equals(boardEntity.getUser().getId())) {
+				boardEntity.increaseHits();
 			}
 			
 			return list;
