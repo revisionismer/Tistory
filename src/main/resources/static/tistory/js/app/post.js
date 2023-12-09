@@ -1476,7 +1476,7 @@ $(document).ready(function(){
 					
 					if(res.data.thumnailImgFileName) {
 						
-						var thumnailImgArea = document.querySelector("#thumnailImgArea")
+						var thumnailImgArea = document.querySelector("#thumnailImgArea");
 						
 						const img_tag = document.createElement("img");
 						
