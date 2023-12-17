@@ -58,10 +58,10 @@ public class Pagination {
 		// 9-7. LIMIT 시작 위치 계산
 		limitStart = (params.getPage() - 1) * params.getRecordPerPage();
 		
-		// 9-8. 이전 페이지 존재 여부 확인
-		existPrevPage = startPage != 1;
+		// 9-8. 이전 페이지 존재 여부 확인 : startPage -> params.getPage() -> 2023-12-12 수정
+		existPrevPage = (params.getPage() != 1);
 		
-		// 9-9. 다음 페이지 존재 여부 확인
-		existNextPage = (endPage * params.getRecordPerPage()) < totalRecordCount;
+		// 9-9. 다음 페이지 존재 여부 확인 : startPage -> params.getPage() -> 2023-12-12 수정
+		existNextPage = (params.getPage() * params.getRecordPerPage()) < totalRecordCount;
 	}
 }

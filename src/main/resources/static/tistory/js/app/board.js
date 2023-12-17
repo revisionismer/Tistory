@@ -85,7 +85,7 @@ $(document).ready(function(){
 					if(res.data.result.list.length == 0) {
 						html += `
 							<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
-								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+								<a class="my_atag_none my_mr_sm_1" id="board_prev">
 									<i class="fa-solid fa-angle-left"></i>
 								</a>
 
@@ -107,7 +107,7 @@ $(document).ready(function(){
 						
 						if(res.data.result.params.pagination.existPrevPage) {
 							html += `
-								<a class="my_atag_none my_mr_sm_1" id="main_prev">
+								<a data-prev="${i}" class="my_atag_none my_mr_sm_1" id="board_prev">
 									<i class="fa-solid fa-angle-left"></i>
 								</a>
 							`;
@@ -125,7 +125,7 @@ $(document).ready(function(){
 						if(res.data.result.params.pagination.existNextPage) {
 							html += `
 						
-								<a class="my_atag_none my_ml_sm_1" id="main_next">
+								<a data-next="${i+2}"  class="my_atag_none my_ml_sm_1" id="board_next">
 									<i class="fa-solid fa-angle-right"></i>
 								</a>
 							`;
@@ -148,6 +148,372 @@ $(document).ready(function(){
 			});
 			
 			
+			/**
+			 * 	5-5. 게시글 리스트 페이징(현재 페이지)
+			 * 
+			 **/
+			$(document).on('click', '#main_page', function(e){
+				e.preventDefault();
+				
+				var main_page = e.currentTarget.innerText;
+				
+				console.log(main_page);
+			
+				var recordPerPage = 10;
+				var pageSize = 10;
+				
+				var url = "/api/boards?page=" + main_page + "&recordPerPage=" + recordPerPage + "&pageSize=" + pageSize;
+				
+				$.ajax({
+					type : "GET",
+					url : url,
+					contentType : "application/json; charset=UTF-8",
+					headers: {
+						"Authorization" : "Bearer " + ACCESS_TOKEN
+					},
+					success : function(res) {
+						console.log(res);	
+						
+						var html = ``;
+						
+						if(!res.data.result.list.length) {
+							html = `<p id="not_board_data_msg">등록된 게시글이 없습니다.</p>`;
+							
+							document.getElementById('not_board_data_area').innerHTML = html;
+							
+							return;
+						} else {
+							for(var i = 0; i < res.data.result.list.length; i++) {
+								html += `
+									<tr onclick="detailBoard(${principalId}, ${res.data.result.list[i].id});">
+										<td>${res.data.result.list[i].id}</td>
+										<td>${res.data.result.list[i].title}</td>
+										<td>${res.data.result.list[i].writer}</td>
+										<td>${res.data.result.list[i].createdAt}</td>
+										<td>${res.data.result.list[i].hits}</td>
+									</tr>
+								`;
+							}
+							
+						}
+						
+						document.getElementById('list').innerHTML = html;
+						
+						html = ``;
+						
+						if(res.data.result.list.length == 0) {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+									<a class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+
+									<a class="my_atag_none_1">
+										<div class="my_paging_number_box my_mr_sm_1_1">
+											1
+										</div>
+									</a>
+
+									<a class="my_atag_none my_ml_sm_1">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								</div>	
+							`;
+						} else {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+							`;
+							
+							if(res.data.result.params.pagination.existPrevPage) {
+								html += `
+									<a data-prev="${i}" class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+								`;
+							}
+							for(var i = 0; i < res.data.result.params.pagination.totalPageCount; i++) {
+								html += `
+										<a class="my_atag_none_1">
+											<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+												${i+1}
+											</div>
+										</a>
+									`;
+							}
+							
+							if(res.data.result.params.pagination.existNextPage) {
+								html += `
+							
+									<a data-next="${i+2}" class="my_atag_none my_ml_sm_1" id="board_next">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								`;
+							}
+							
+							html += `
+								</div>	
+								
+							`;
+						}
+						
+						document.getElementById('pagination').innerHTML = html;
+
+							
+					},
+					error : function(res) {
+						console.log(res);
+
+					}
+				});
+					
+			});
+			
+			
+			/**
+			 * 	5-6. 게시글 리스트 페이징(이전 페이지) : 2023-12-12 : 페이징 완료
+			 * 
+			 **/
+			$(document).on('click', '#board_prev', function(e){
+				e.preventDefault();
+			
+				const board_prev = document.querySelector("#board_prev");
+				
+				console.log(board_prev.dataset.prev);
+				
+				var prevPage = board_prev.dataset.prev;
+				
+				var recordPerPage = 10;
+				var pageSize = 10;
+				
+				var url = "/api/boards?page=" + prevPage + "&recordPerPage=" + recordPerPage + "&pageSize=" + pageSize;
+				
+				$.ajax({
+					type : "GET",
+					url : url,
+					contentType : "application/json; charset=UTF-8",
+					headers: {
+						"Authorization" : "Bearer " + ACCESS_TOKEN
+					},
+					success : function(res) {
+						console.log(res);	
+						
+						var html = ``;
+						
+						if(!res.data.result.list.length) {
+							html = `<p id="not_board_data_msg">등록된 게시글이 없습니다.</p>`;
+							
+							document.getElementById('not_board_data_area').innerHTML = html;
+							
+							return;
+						} else {
+							for(var i = 0; i < res.data.result.list.length; i++) {
+								html += `
+									<tr onclick="detailBoard(${principalId}, ${res.data.result.list[i].id});">
+										<td>${res.data.result.list[i].id}</td>
+										<td>${res.data.result.list[i].title}</td>
+										<td>${res.data.result.list[i].writer}</td>
+										<td>${res.data.result.list[i].createdAt}</td>
+										<td>${res.data.result.list[i].hits}</td>
+									</tr>
+								`;
+							}
+							
+						}
+						
+						document.getElementById('list').innerHTML = html;
+						
+						html = ``;
+						
+						if(res.data.result.list.length == 0) {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+									<a class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+
+									<a class="my_atag_none_1">
+										<div class="my_paging_number_box my_mr_sm_1_1">
+											1
+										</div>
+									</a>
+
+									<a class="my_atag_none my_ml_sm_1">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								</div>	
+							`;
+						} else {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+							`;
+							
+							if(res.data.result.params.pagination.existPrevPage) {
+								html += `
+									<a data-prev="${i}" class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+								`;
+							}
+							for(var i = 0; i < res.data.result.params.pagination.totalPageCount; i++) {
+								html += `
+										<a class="my_atag_none_1">
+											<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+												${i+1}
+											</div>
+										</a>
+									`;
+							}
+							
+							if(res.data.result.params.pagination.existNextPage) {
+								html += `
+							
+									<a data-next="${i+2}" class="my_atag_none my_ml_sm_1" id="board_next">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								`;
+							}
+							
+							html += `
+								</div>	
+								
+							`;
+						}
+						
+						document.getElementById('pagination').innerHTML = html;
+
+							
+					},
+					error : function(res) {
+						console.log(res);
+
+					}
+				});
+				
+				
+			});
+			
+			/**
+			 * 	5-6. 게시글 리스트 페이징(이전 페이지)
+			 * 
+			 **/
+			$(document).on('click', '#board_next', function(e){
+				e.preventDefault();
+			
+				const board_next = document.querySelector("#board_next");
+				
+				console.log(board_next.dataset.next);
+				
+				var nextPage = board_next.dataset.next;
+				
+				var recordPerPage = 10;
+				var pageSize = 10;
+				
+				var url = "/api/boards?page=" + nextPage + "&recordPerPage=" + recordPerPage + "&pageSize=" + pageSize;
+				
+				$.ajax({
+					type : "GET",
+					url : url,
+					contentType : "application/json; charset=UTF-8",
+					headers: {
+						"Authorization" : "Bearer " + ACCESS_TOKEN
+					},
+					success : function(res) {
+						console.log(res);	
+						
+						var html = ``;
+						
+						if(!res.data.result.list.length) {
+							html = `<p id="not_board_data_msg">등록된 게시글이 없습니다.</p>`;
+							
+							document.getElementById('not_board_data_area').innerHTML = html;
+							
+							return;
+						} else {
+							for(var i = 0; i < res.data.result.list.length; i++) {
+								html += `
+									<tr onclick="detailBoard(${principalId}, ${res.data.result.list[i].id});">
+										<td>${res.data.result.list[i].id}</td>
+										<td>${res.data.result.list[i].title}</td>
+										<td>${res.data.result.list[i].writer}</td>
+										<td>${res.data.result.list[i].createdAt}</td>
+										<td>${res.data.result.list[i].hits}</td>
+									</tr>
+								`;
+							}
+							
+						}
+						
+						document.getElementById('list').innerHTML = html;
+						
+						html = ``;
+						
+						if(res.data.result.list.length == 0) {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+									<a class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+
+									<a class="my_atag_none_1">
+										<div class="my_paging_number_box my_mr_sm_1_1">
+											1
+										</div>
+									</a>
+
+									<a class="my_atag_none my_ml_sm_1">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								</div>	
+							`;
+						} else {
+							html += `
+								<div class="my_paging d-flex justify-content-center align-items-center my_mb_lg_1">
+							`;
+							
+							if(res.data.result.params.pagination.existPrevPage) {
+								html += `
+									<a data-prev="${i}" class="my_atag_none my_mr_sm_1" id="board_prev">
+										<i class="fa-solid fa-angle-left"></i>
+									</a>
+								`;
+							}
+							for(var i = 0; i < res.data.result.params.pagination.totalPageCount; i++) {
+								html += `
+										<a class="my_atag_none_1">
+											<div data-set="${i+1}" id="main_page" class="my_paging_number_box my_mr_sm_1_1">
+												${i+1}
+											</div>
+										</a>
+									`;
+							}
+							
+							if(res.data.result.params.pagination.existNextPage) {
+								html += `
+							
+									<a data-next="${i+2}" class="my_atag_none my_ml_sm_1" id="board_next">
+										<i class="fa-solid fa-angle-right"></i>
+									</a>
+								`;
+							}
+							
+							html += `
+								</div>	
+								
+							`;
+						}
+						
+						document.getElementById('pagination').innerHTML = html;
+
+							
+					},
+					error : function(res) {
+						console.log(res);
+
+					}
+				});
+				
+				
+			});
 		}
 		
 		/**
