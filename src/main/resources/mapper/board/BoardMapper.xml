@@ -23,11 +23,12 @@
 			<if test="keyword != null and keyword.equals('') == false">
 				<choose>
 					<!-- 2022-12-15 -> searchType = null => searchType == null로 변경 -->
+					<!-- 2023-12-27 : 공백 포함 검색 쿼리 수정(정규표현식 사용) LIKE CONCAT('%', #{keyword}, '%') -> REGEXP #{keyword}  -->
 					<when test="searchType == null or searchType.equals('')">
 						AND (
-							   title LIKE CONCAT('%', #{keyword}, '%') 
+							   title LIKE CONCAT('%', #{keyword}, '%')
 							OR content LIKE CONCAT('%', #{keyword}, '%')
-							OR writer LIKE CONCAT('%', #{keyword}, '%')	 	
+							OR writer LIKE CONCAT('%', #{keyword}, '%')
 						)
 					</when>
 					<otherwise>
